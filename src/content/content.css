@@ -1,0 +1,52 @@
+:root[data-xes-enabled="true"][data-xes-hide-promoted-posts="true"]
+  article[data-testid="tweet"][data-xes-promoted="true"] {
+  display: none !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
+  [data-testid="sidebarColumn"] {
+  display: none !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
+  [data-testid="primaryColumn"] {
+  max-width: 720px !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-hide-trends="true"]
+  [data-testid="sidebarColumn"]
+  [aria-label*="Trending"],
+:root[data-xes-enabled="true"][data-xes-hide-trends="true"]
+  [data-testid="sidebarColumn"]
+  [aria-label*="trending"] {
+  display: none !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-hide-premium-nav="true"]
+  header
+  a[href^="/i/premium"] {
+  display: none !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-hide-grok-nav="true"]
+  header
+  [data-testid="AppTabBar_Grok_Link"],
+:root[data-xes-enabled="true"][data-xes-hide-grok-nav="true"]
+  header
+  a[href^="/i/grok"] {
+  display: none !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  [data-testid="cellInnerDiv"]
+  article[data-testid="tweet"] {
+  padding-block: 4px !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  [data-testid="tweetText"] {
+  line-height: 1.22 !important;
+}

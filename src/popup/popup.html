@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>X Enhancement Suite</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <header class="hero">
+      <img src="../../assets/icon-48.png" alt="" width="40" height="40">
+      <div>
+        <h1>X Enhancement Suite</h1>
+        <p><span class="status-dot"></span>Ready on X</p>
+      </div>
+    </header>
+
+    <main>
+      <div id="settings" class="settings" aria-live="polite"></div>
+      <p id="message" class="message" role="status"></p>
+    </main>
+
+    <footer>
+      <button id="open-options" type="button">Custom CSS</button>
+      <span>Changes apply instantly</span>
+    </footer>
+
+    <script src="../shared/settings.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

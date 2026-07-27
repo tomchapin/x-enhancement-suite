@@ -1,0 +1,164 @@
+:root {
+  color-scheme: light dark;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: #0b0d11;
+  color: #e7e9ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  width: min(840px, calc(100% - 40px));
+  margin: 64px auto;
+}
+
+header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+header img {
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgb(59 130 246 / 22%);
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #7db2ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.intro {
+  margin: 6px 0 0;
+  color: #8b98a5;
+}
+
+.panel {
+  padding: 26px;
+  border: 1px solid #2f3336;
+  border-radius: 18px;
+  background: #111318;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 28%);
+}
+
+label {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hint {
+  margin: 6px 0 16px;
+  color: #8b98a5;
+  line-height: 1.5;
+}
+
+code {
+  color: #b5d3ff;
+}
+
+textarea {
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  border: 1px solid #3a3f45;
+  border-radius: 12px;
+  padding: 16px;
+  outline: none;
+  color: #dbeafe;
+  background: #090b0e;
+  font: 13px/1.6 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+textarea:focus {
+  border-color: #4f8df7;
+  box-shadow: 0 0 0 3px rgb(79 141 247 / 16%);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 9px 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary {
+  color: white;
+  background: #3978e8;
+}
+
+.primary:hover {
+  background: #4f8df7;
+}
+
+.secondary {
+  border-color: #3a3f45;
+  color: #c2c8ce;
+  background: transparent;
+}
+
+.secondary:hover {
+  border-color: #65717c;
+}
+
+#status {
+  margin: 0 0 0 auto;
+  color: #86efac;
+  font-size: 13px;
+}
+
+aside {
+  margin-top: 16px;
+  padding-inline: 4px;
+  color: #6f7b86;
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin-block: 28px;
+  }
+
+  header {
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #status {
+    margin-left: 0;
+  }
+}

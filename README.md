@@ -1,0 +1,67 @@
+# X Enhancement Suite
+
+A private, dependency-free Chrome extension for making personal DOM and style
+changes on [X](https://x.com).
+
+The starter extension includes:
+
+- One-click enable/disable from the toolbar
+- Optional hiding of promoted posts, the right sidebar, trending topics,
+  Premium navigation, and Grok navigation
+- A compact timeline mode
+- Custom CSS for personal tweaks
+- Settings synchronized through Chrome
+- Live updates in already-open X tabs
+- MutationObserver-based handling for X's dynamically rendered timeline
+
+## Install locally
+
+1. Clone this repository.
+2. Open `chrome://extensions` in Chrome.
+3. Turn on **Developer mode**.
+4. Click **Load unpacked**.
+5. Select this repository's root directory.
+6. Pin **X Enhancement Suite** from Chrome's Extensions menu.
+
+After changing extension source files, click the extension's reload button on
+`chrome://extensions`, then refresh any open X tabs.
+
+## Customize it
+
+The toolbar popup controls the built-in enhancements. Click **Custom CSS** in
+the popup to add personal styles without changing source files.
+
+For JavaScript DOM changes, add a focused function to
+[`src/content/content.js`](src/content/content.js) and call it from
+`scanForEnhancements()`. Prefer stable accessibility attributes and
+`data-testid` values over generated class names, which change frequently on X.
+
+Built-in visual rules live in
+[`src/content/content.css`](src/content/content.css). Each rule is gated by a
+`data-xes-*` attribute set on the root `<html>` element.
+
+## Development
+
+The project intentionally has no runtime or development dependencies. Node.js
+20 or newer is recommended for the included tooling.
+
+```sh
+npm test
+npm run validate
+npm run package
+```
+
+`npm run package` creates a versioned ZIP in `dist/`. The unpacked repository
+remains the easiest way to install this private extension.
+
+## Privacy and permissions
+
+The extension runs only on `x.com` and `twitter.com`. It requests Chrome's
+`storage` permission solely to persist extension settings. It does not make
+network requests, collect analytics, or transmit browsing data.
+
+## Notes
+
+X is a frequently changing single-page application. Selectors may occasionally
+need updates after X changes its markup. This project is intended for personal
+use and is not affiliated with X Corp.
