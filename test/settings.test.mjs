@@ -21,18 +21,23 @@ const {
   normalizeSettings
 } = context.XEnhancementSettings;
 
-test("defaults include a master switch and custom CSS", () => {
-  assert.equal(DEFAULT_SETTINGS.enabled, true);
+test("all boolean settings default off", () => {
+  for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+    if (typeof value === "boolean") {
+      assert.equal(value, false, key);
+    }
+  }
+
   assert.equal(DEFAULT_SETTINGS.customCss, "");
-  assert.equal(DEFAULT_SETTINGS.hideFeedAds, true);
-  assert.equal(DEFAULT_SETTINGS.hideBoostedPosts, true);
+  assert.equal(DEFAULT_SETTINGS.hideFeedAds, false);
+  assert.equal(DEFAULT_SETTINGS.hideBoostedPosts, false);
   assert.equal(DEFAULT_SETTINGS.hideFeedWhoToFollow, false);
   assert.equal(DEFAULT_SETTINGS.hideNewPostsPopup, false);
   assert.equal(DEFAULT_SETTINGS.hidePostAnalyticsPromotions, false);
-  assert.equal(DEFAULT_SETTINGS.hideKeywordPosts, true);
+  assert.equal(DEFAULT_SETTINGS.hideKeywordPosts, false);
   assert.equal(DEFAULT_SETTINGS.blockedKeywordsCaseSensitive, false);
-  assert.equal(DEFAULT_SETTINGS.hideSidebarPremium, true);
-  assert.equal(DEFAULT_SETTINGS.hideSidebarAds, true);
+  assert.equal(DEFAULT_SETTINGS.hideSidebarPremium, false);
+  assert.equal(DEFAULT_SETTINGS.hideSidebarAds, false);
   assert.ok(TOGGLE_DEFINITIONS.some(({ key }) => key === "enabled"));
 });
 

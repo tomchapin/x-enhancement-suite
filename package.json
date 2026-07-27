@@ -1,6 +1,6 @@
 {
   "name": "x-enhancement-suite",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "description": "Experimental (dev mode only) Chrome extension for personal X DOM enhancements.",
   "type": "module",
