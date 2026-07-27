@@ -1,5 +1,7 @@
-:root[data-xes-enabled="true"][data-xes-hide-promoted-posts="true"]
-  article[data-testid="tweet"][data-xes-promoted] {
+:root[data-xes-enabled="true"][data-xes-hide-feed-ads="true"]
+  article[data-testid="tweet"][data-xes-promotion="ad"],
+:root[data-xes-enabled="true"][data-xes-hide-boosted-posts="true"]
+  article[data-testid="tweet"][data-xes-promotion="boosted"] {
   display: none !important;
 }
 
@@ -13,20 +15,36 @@
   max-width: 720px !important;
 }
 
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-search="true"]
+  [data-testid="sidebarColumn"]
+  form[role="search"][aria-label="Search"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-premium="true"]
+  [data-testid="sidebarColumn"]
+  aside[aria-label="Subscribe to Premium"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-live="true"]
+  [data-testid="sidebarColumn"]
+  [data-xes-sidebar-module="live"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-news="true"]
+  [data-testid="sidebarColumn"]
+  [data-xes-sidebar-module="news"],
 :root[data-xes-enabled="true"][data-xes-hide-trends="true"]
   [data-testid="sidebarColumn"]
-  [aria-label*="Trending"],
-:root[data-xes-enabled="true"][data-xes-hide-trends="true"]
+  section:has([aria-label="Timeline: Trending now"]),
+:root[data-xes-enabled="true"][data-xes-hide-who-to-follow="true"]
   [data-testid="sidebarColumn"]
-  [aria-label*="trending"] {
+  aside[aria-label="Who to follow"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-ads="true"]
+  [data-testid="sidebarColumn"]
+  [data-testid$="SspAd"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-footer="true"]
+  [data-testid="sidebarColumn"]
+  nav[aria-label="Footer"] {
   display: none !important;
 }
 
-:root[data-xes-enabled="true"][data-xes-hide-premium-promotions="true"]
+:root[data-xes-enabled="true"][data-xes-hide-premium-nav="true"]
   header
-  a[href^="/i/premium"],
-:root[data-xes-enabled="true"][data-xes-hide-premium-promotions="true"]
-  aside[aria-label="Subscribe to Premium"] {
+  a[href^="/i/premium"] {
   display: none !important;
 }
 
@@ -43,12 +61,55 @@
   [data-testid="primaryColumn"]
   [data-testid="cellInnerDiv"]
   article[data-testid="tweet"] {
-  padding-block: 4px !important;
+  padding: 0 10px !important;
+  font-size: 14px !important;
 }
 
 :root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
   [data-testid="primaryColumn"]
   article[data-testid="tweet"]
   [data-testid="tweetText"] {
-  line-height: 1.22 !important;
+  margin-top: 2px !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  div:has(> div > [data-testid="reply"]) {
+  margin-top: 6px !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  [data-testid="tweetPhoto"],
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  [data-testid="videoPlayer"] {
+  max-height: 240px !important;
+  overflow: hidden !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  div:has([data-testid="tweetPhoto"]):not(:has([data-testid="tweetText"])),
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  div:has([data-testid="videoPlayer"]):not(:has([data-testid="tweetText"])) {
+  max-height: 240px !important;
+  overflow: hidden !important;
+}
+
+:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  :is([data-testid="tweetPhoto"], [data-testid="videoPlayer"])
+  :is(img, video) {
+  max-height: 240px !important;
+  object-fit: cover !important;
 }

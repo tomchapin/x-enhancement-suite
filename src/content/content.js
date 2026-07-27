@@ -6,20 +6,32 @@
     getSettings,
     normalizeSettings
   } = globalThis.XEnhancementSettings;
-  const { isPromotedLabel } = globalThis.XEnhancementRules;
+  const {
+    promotionTypeForLabel,
+    sidebarModuleForHeading
+  } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
     enabled: "data-xes-enabled",
-    hidePromotedPosts: "data-xes-hide-promoted-posts",
+    hideFeedAds: "data-xes-hide-feed-ads",
+    hideBoostedPosts: "data-xes-hide-boosted-posts",
+    compactTimeline: "data-xes-compact-timeline",
     hideSidebar: "data-xes-hide-sidebar",
+    hideSidebarSearch: "data-xes-hide-sidebar-search",
+    hideSidebarPremium: "data-xes-hide-sidebar-premium",
+    hideSidebarLive: "data-xes-hide-sidebar-live",
+    hideSidebarNews: "data-xes-hide-sidebar-news",
     hideTrends: "data-xes-hide-trends",
-    hidePremiumPromotions: "data-xes-hide-premium-promotions",
-    hideGrokNav: "data-xes-hide-grok-nav",
-    compactTimeline: "data-xes-compact-timeline"
+    hideWhoToFollow: "data-xes-hide-who-to-follow",
+    hideSidebarAds: "data-xes-hide-sidebar-ads",
+    hideSidebarFooter: "data-xes-hide-sidebar-footer",
+    hidePremiumNav: "data-xes-hide-premium-nav",
+    hideGrokNav: "data-xes-hide-grok-nav"
   });
 
   const CUSTOM_STYLE_ID = "xes-custom-styles";
-  const PROMOTED_MARKER = "data-xes-promoted";
+  const PROMOTION_ATTRIBUTE = "data-xes-promotion";
+  const SIDEBAR_MODULE_ATTRIBUTE = "data-xes-sidebar-module";
 
   let currentSettings;
   let observer;
@@ -36,7 +48,7 @@
 
     applyCustomCss(currentSettings.customCss);
 
-    if (currentSettings.enabled && currentSettings.hidePromotedPosts) {
+    if (currentSettings.enabled) {
       scanForEnhancements(document);
     }
   }
@@ -59,17 +71,18 @@
     style.disabled = !currentSettings.enabled;
   }
 
-  function isPromotedPost(article) {
+  function promotionTypeForPost(article) {
     for (const element of article.querySelectorAll("span")) {
-      const label = element.textContent?.trim();
-      if (isPromotedLabel(label)) {
-        return true;
+      const type = promotionTypeForLabel(element.textContent);
+      if (type) {
+        return type;
       }
     }
-    return false;
+
+    return null;
   }
 
-  function markPromotedPosts(root) {
+  function markPaidPosts(root) {
     const articles = new Set();
 
     if (root instanceof Element) {
@@ -86,12 +99,47 @@
     }
 
     for (const article of articles) {
-      article.toggleAttribute(PROMOTED_MARKER, isPromotedPost(article));
+      const type = promotionTypeForPost(article);
+      if (type) {
+        article.setAttribute(PROMOTION_ATTRIBUTE, type);
+      } else {
+        article.removeAttribute(PROMOTION_ATTRIBUTE);
+      }
+    }
+  }
+
+  function markSidebarModules(root) {
+    const headings = new Set();
+
+    if (
+      root instanceof Element &&
+      root.matches('h2[role="heading"]')
+    ) {
+      headings.add(root);
+    }
+
+    if (typeof root.querySelectorAll === "function") {
+      for (const heading of root.querySelectorAll('h2[role="heading"]')) {
+        headings.add(heading);
+      }
+    }
+
+    for (const heading of headings) {
+      const moduleName = sidebarModuleForHeading(heading.textContent);
+      const module = heading.parentElement?.parentElement;
+
+      if (
+        moduleName &&
+        module?.closest('[data-testid="sidebarColumn"]')
+      ) {
+        module.setAttribute(SIDEBAR_MODULE_ATTRIBUTE, moduleName);
+      }
     }
   }
 
   function scanForEnhancements(root) {
-    markPromotedPosts(root);
+    markPaidPosts(root);
+    markSidebarModules(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:
     // X reuses and rerenders timeline nodes as users navigate and scroll.
@@ -99,7 +147,7 @@
 
   function startObserver() {
     observer = new MutationObserver((mutations) => {
-      if (!currentSettings?.enabled || !currentSettings.hidePromotedPosts) {
+      if (!currentSettings?.enabled) {
         return;
       }
 

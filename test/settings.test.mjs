@@ -20,7 +20,10 @@ const {
 test("defaults include a master switch and custom CSS", () => {
   assert.equal(DEFAULT_SETTINGS.enabled, true);
   assert.equal(DEFAULT_SETTINGS.customCss, "");
-  assert.equal(DEFAULT_SETTINGS.hidePremiumPromotions, true);
+  assert.equal(DEFAULT_SETTINGS.hideFeedAds, true);
+  assert.equal(DEFAULT_SETTINGS.hideBoostedPosts, true);
+  assert.equal(DEFAULT_SETTINGS.hideSidebarPremium, true);
+  assert.equal(DEFAULT_SETTINGS.hideSidebarAds, true);
   assert.ok(TOGGLE_DEFINITIONS.some(({ key }) => key === "enabled"));
 });
 
@@ -54,4 +57,36 @@ test("every toggle maps to a boolean setting", () => {
   for (const { key } of TOGGLE_DEFINITIONS) {
     assert.equal(typeof DEFAULT_SETTINGS[key], "boolean", key);
   }
+});
+
+test("migrates combined paid-content and Premium settings", () => {
+  const settings = normalizeSettings({
+    hidePromotedPosts: false,
+    hidePremiumPromotions: false
+  });
+
+  assert.equal(settings.hideFeedAds, false);
+  assert.equal(settings.hideBoostedPosts, false);
+  assert.equal(settings.hideSidebarPremium, false);
+});
+
+test("groups granular sidebar toggles", () => {
+  const sidebarKeys = TOGGLE_DEFINITIONS
+    .filter(({ group }) => group === "Right sidebar")
+    .map(({ key }) => key);
+
+  assert.deepEqual(
+    [...sidebarKeys],
+    [
+      "hideSidebar",
+      "hideSidebarSearch",
+      "hideSidebarPremium",
+      "hideSidebarLive",
+      "hideSidebarNews",
+      "hideTrends",
+      "hideWhoToFollow",
+      "hideSidebarAds",
+      "hideSidebarFooter"
+    ]
+  );
 });

@@ -13,7 +13,9 @@
   function buildSetting(definition, checked) {
     const row = document.createElement("div");
     row.className = "setting";
+    row.classList.toggle("is-nested", definition.nested === true);
     row.dataset.setting = definition.key;
+    row.dataset.group = definition.group;
 
     const labelText = document.createElement("div");
     labelText.className = "setting-label";
@@ -40,7 +42,7 @@
 
       try {
         const next = await setSettings({ [definition.key]: input.checked });
-        updateDisabledState(next.enabled);
+        updateDisabledState(next);
       } catch (error) {
         input.checked = !input.checked;
         message.textContent = "Could not save this setting.";
@@ -55,25 +57,44 @@
     return row;
   }
 
-  function updateDisabledState(enabled) {
+  function updateDisabledState(settings) {
     for (const row of settingsContainer.querySelectorAll(".setting")) {
-      if (row.dataset.setting !== "enabled") {
-        row.classList.toggle("is-disabled", !enabled);
-      }
+      const isMaster = row.dataset.setting === "enabled";
+      const isSidebarChild =
+        row.dataset.group === "Right sidebar" &&
+        row.dataset.setting !== "hideSidebar";
+
+      row.classList.toggle(
+        "is-disabled",
+        !settings.enabled && !isMaster
+      );
+      row.classList.toggle(
+        "is-context-disabled",
+        settings.enabled && settings.hideSidebar && isSidebarChild
+      );
     }
   }
 
   async function initialize() {
     try {
       const settings = await getSettings();
+      let currentGroup;
 
       for (const definition of TOGGLE_DEFINITIONS) {
+        if (definition.group !== currentGroup) {
+          currentGroup = definition.group;
+          const heading = document.createElement("h2");
+          heading.className = "group-title";
+          heading.textContent = currentGroup;
+          settingsContainer.append(heading);
+        }
+
         settingsContainer.append(
           buildSetting(definition, settings[definition.key])
         );
       }
 
-      updateDisabledState(settings.enabled);
+      updateDisabledState(settings);
     } catch (error) {
       message.textContent = "Could not load extension settings.";
       console.error(error);

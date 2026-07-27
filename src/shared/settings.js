@@ -5,12 +5,20 @@
 
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
-    hidePromotedPosts: true,
-    hideSidebar: false,
-    hideTrends: false,
-    hidePremiumPromotions: true,
-    hideGrokNav: false,
+    hideFeedAds: true,
+    hideBoostedPosts: true,
     compactTimeline: false,
+    hideSidebar: false,
+    hideSidebarSearch: false,
+    hideSidebarPremium: true,
+    hideSidebarLive: false,
+    hideSidebarNews: false,
+    hideTrends: false,
+    hideWhoToFollow: false,
+    hideSidebarAds: true,
+    hideSidebarFooter: false,
+    hidePremiumNav: false,
+    hideGrokNav: false,
     customCss: ""
   });
 
@@ -18,48 +26,133 @@
     {
       key: "enabled",
       label: "Enable enhancements",
-      description: "Master switch for every X modification."
+      description: "Master switch for every X modification.",
+      group: "General"
     },
     {
-      key: "hidePromotedPosts",
-      label: "Hide promoted posts",
-      description: "Hides timeline posts marked Ad or Promoted."
+      key: "hideFeedAds",
+      label: "Hide feed ads",
+      description: "Hides posts marked Ad, Promoted, or Sponsored.",
+      group: "Feed"
     },
     {
-      key: "hideSidebar",
-      label: "Hide right sidebar",
-      description: "Removes the entire secondary column."
-    },
-    {
-      key: "hideTrends",
-      label: "Hide trending topics",
-      description: "Keeps the sidebar but removes trending timelines."
-    },
-    {
-      key: "hidePremiumPromotions",
-      label: "Hide Premium promotions",
-      description: "Removes Premium upsells and its navigation link."
-    },
-    {
-      key: "hideGrokNav",
-      label: "Hide Grok link",
-      description: "Removes Grok from the primary navigation."
+      key: "hideBoostedPosts",
+      label: "Hide boosted posts",
+      description: "Hides posts specifically marked Boosted.",
+      group: "Feed"
     },
     {
       key: "compactTimeline",
       label: "Compact timeline",
-      description: "Reduces spacing between timeline items."
+      description: "Condenses text, spacing, controls, and media previews.",
+      group: "Feed"
+    },
+    {
+      key: "hideSidebar",
+      label: "Hide right sidebar",
+      description: "Removes the entire secondary column.",
+      group: "Right sidebar"
+    },
+    {
+      key: "hideSidebarSearch",
+      label: "Hide search",
+      description: "Removes the sidebar search box.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarPremium",
+      label: "Hide Premium card",
+      description: "Removes the Subscribe to Premium card.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarLive",
+      label: "Hide Live on X",
+      description: "Removes the live broadcasts module.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarNews",
+      label: "Hide Today’s News",
+      description: "Removes the news module.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideTrends",
+      label: "Hide trending topics",
+      description: "Removes only the Trending now module.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideWhoToFollow",
+      label: "Hide Who to follow",
+      description: "Removes account recommendations.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarAds",
+      label: "Hide sidebar ads",
+      description: "Removes display-ad placements from the sidebar.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarFooter",
+      label: "Hide footer links",
+      description: "Removes the sidebar’s legal and footer links.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hidePremiumNav",
+      label: "Hide Premium link",
+      description: "Removes Premium from the primary navigation.",
+      group: "Navigation"
+    },
+    {
+      key: "hideGrokNav",
+      label: "Hide Grok link",
+      description: "Removes Grok from the primary navigation.",
+      group: "Navigation"
     }
   ]);
 
   function normalizeSettings(value) {
     const candidate = value && typeof value === "object" ? value : {};
+    const migrated = { ...candidate };
     const normalized = {};
+
+    if (
+      typeof migrated.hideFeedAds !== "boolean" &&
+      typeof candidate.hidePromotedPosts === "boolean"
+    ) {
+      migrated.hideFeedAds = candidate.hidePromotedPosts;
+    }
+
+    if (
+      typeof migrated.hideBoostedPosts !== "boolean" &&
+      typeof candidate.hidePromotedPosts === "boolean"
+    ) {
+      migrated.hideBoostedPosts = candidate.hidePromotedPosts;
+    }
+
+    if (
+      typeof migrated.hideSidebarPremium !== "boolean" &&
+      typeof candidate.hidePremiumPromotions === "boolean"
+    ) {
+      migrated.hideSidebarPremium = candidate.hidePremiumPromotions;
+    }
 
     for (const [key, defaultValue] of Object.entries(DEFAULT_SETTINGS)) {
       normalized[key] =
-        typeof candidate[key] === typeof defaultValue
-          ? candidate[key]
+        typeof migrated[key] === typeof defaultValue
+          ? migrated[key]
           : defaultValue;
     }
 

@@ -6,9 +6,10 @@ changes on [X](https://x.com).
 The starter extension includes:
 
 - One-click enable/disable from the toolbar
-- Optional hiding of promoted posts, the right sidebar, trending topics,
-  Premium promotions, and Grok navigation
-- A compact timeline mode
+- Independent filtering for feed ads and Boosted posts
+- Granular controls for search, Premium, Live on X, news, trends, Who to
+  follow, sidebar ads, and footer links
+- A denser compact timeline mode with smaller media previews
 - Custom CSS for personal tweaks
 - Settings synchronized through Chrome
 - Live updates in already-open X tabs

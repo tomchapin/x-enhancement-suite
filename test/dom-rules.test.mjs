@@ -15,27 +15,40 @@ const contentCss = await readFile(
 const context = vm.createContext({});
 vm.runInContext(source, context);
 
-const { isPromotedLabel } = context.XEnhancementRules;
+const {
+  promotionTypeForLabel,
+  sidebarModuleForHeading
+} = context.XEnhancementRules;
 
-test("recognizes X paid-placement labels", () => {
-  for (const label of ["Ad", "Promoted", "Boosted", "Sponsored"]) {
-    assert.equal(isPromotedLabel(label), true, label);
+test("classifies feed ads separately from boosted posts", () => {
+  for (const label of ["Ad", "Promoted", "Sponsored"]) {
+    assert.equal(promotionTypeForLabel(label), "ad", label);
   }
 
-  assert.equal(isPromotedLabel("Advertisement tips"), false);
-  assert.equal(isPromotedLabel(undefined), false);
+  assert.equal(promotionTypeForLabel("Boosted"), "boosted");
+  assert.equal(promotionTypeForLabel("Advertisement tips"), null);
+  assert.equal(promotionTypeForLabel(undefined), null);
 });
 
-test("hides presence-only promoted markers", () => {
-  assert.match(
-    contentCss,
-    /article\[data-testid="tweet"\]\[data-xes-promoted\]/
-  );
+test("recognizes sidebar modules by their headings", () => {
+  assert.equal(sidebarModuleForHeading("Live on X"), "live");
+  assert.equal(sidebarModuleForHeading("Today’s News"), "news");
+  assert.equal(sidebarModuleForHeading("Today's News"), "news");
+  assert.equal(sidebarModuleForHeading("Who to follow"), null);
 });
 
-test("targets the current Premium subscription card", () => {
-  assert.match(
-    contentCss,
-    /aside\[aria-label="Subscribe to Premium"\]/
-  );
+test("uses independent feed ad and boosted selectors", () => {
+  assert.match(contentCss, /data-xes-promotion="ad"/);
+  assert.match(contentCss, /data-xes-promotion="boosted"/);
+});
+
+test("targets granular sidebar modules without the broad Trending wrapper", () => {
+  assert.match(contentCss, /Timeline: Trending now/);
+  assert.match(contentCss, /data-testid\$="SspAd"/);
+  assert.match(contentCss, /aria-label="Who to follow"/);
+  assert.doesNotMatch(contentCss, /aria-label\*="Trending"/);
+});
+
+test("compact mode caps media previews", () => {
+  assert.match(contentCss, /max-height: 240px !important/);
 });
