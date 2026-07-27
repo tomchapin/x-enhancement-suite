@@ -1,7 +1,15 @@
 # X Enhancement Suite
 
-A private, dependency-free Manifest V3 Chrome extension for making personal DOM
-and style changes on [X](https://x.com).
+An experimental, dev-mode-only Manifest V3 Chrome extension for making
+personal DOM and style changes on [X](https://x.com).
+
+<p align="center">
+  <img
+    src="docs/images/extension-popup.png"
+    alt="X Enhancement Suite popup showing feed and right-sidebar controls"
+    width="420"
+  >
+</p>
 
 The extension currently provides:
 
