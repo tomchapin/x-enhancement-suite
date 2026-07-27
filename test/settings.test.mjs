@@ -110,6 +110,9 @@ test("groups independent feed controls", () => {
   const feedKeys = TOGGLE_DEFINITIONS
     .filter(({ group }) => group === "Feed")
     .map(({ key }) => key);
+  const whoToFollowToggle = TOGGLE_DEFINITIONS.find(
+    ({ key }) => key === "hideFeedWhoToFollow"
+  );
 
   assert.deepEqual(
     [...feedKeys],
@@ -120,5 +123,9 @@ test("groups independent feed controls", () => {
       "hideNewPostsPopup",
       "hidePostAnalyticsPromotions"
     ]
+  );
+  assert.equal(
+    whoToFollowToggle.label,
+    "Hide Who to Follow from feed"
   );
 });

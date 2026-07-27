@@ -45,7 +45,7 @@
     },
     {
       key: "hideFeedWhoToFollow",
-      label: "Hide feed Who to follow",
+      label: "Hide Who to Follow from feed",
       description: "Removes inline account recommendations from the timeline.",
       group: "Feed"
     },
