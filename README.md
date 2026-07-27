@@ -11,23 +11,87 @@ personal DOM and style changes on [X](https://x.com).
   >
 </p>
 
-The extension currently provides:
+It provides independent feed, sidebar, and navigation controls; a synchronized
+blocked-keyword list; and custom CSS. Every built-in DOM change is reversible
+without deleting X's content.
 
-- One-click enable/disable from the toolbar
-- Independent filtering for feed ads and Boosted posts
-- A separate filter for inline “Who to follow” recommendations in the feed
-- A separate filter for the blue new-posts scroll-to-top popup
-- A separate filter for post-analytics Premium promotions in feeds and post
-  detail views
-- A blocked-keyword filter with optional case-sensitive matching and a
-  dedicated list-management page
-- Granular controls for search, Premium, Live on X, news, trends, Who to
-  follow, sidebar ads, and footer links
-- Independent controls for Premium and Grok navigation links
-- Custom CSS for personal tweaks
-- Settings synchronized through Chrome
-- Live updates in already-open X tabs
-- MutationObserver-based handling for X's dynamically rendered interface
+## Feature reference
+
+The toolbar popup is the main control surface. Changes apply immediately to
+open X tabs, including content that X adds later while navigating or scrolling.
+The defaults below apply to a new installation or after **Reset all settings**.
+
+### General
+
+| Control | Default | Behavior |
+| --- | --- | --- |
+| **Enable enhancements** | On | Master switch for all built-in filters and custom CSS. Turning it off restores X's original presentation while preserving the saved individual settings. |
+
+### Feed
+
+| Control | Default | Behavior |
+| --- | --- | --- |
+| **Hide feed ads** | On | Hides complete feed posts marked `Ad`, `Promoted`, or `Sponsored`. |
+| **Hide boosted posts** | On | Independently hides complete posts specifically marked `Boosted`. It does not depend on the feed-ad setting. |
+| **Hide Who to Follow from feed** | Off | Removes the complete inline account-recommendation module, including its heading, suggested accounts, and “Show more” row. It does not affect the separate sidebar module. |
+| **Hide new-posts popup** | Off | Removes the blue scroll-to-top notice that overlays the feed when X detects new posts. Ordinary feed controls remain visible. |
+| **Hide analytics promotions** | Off | Removes X Premium cards such as “Access your post analytics” from feeds and post-detail views without hiding the surrounding post. |
+| **Hide posts with keywords** | On | Hides complete feed posts that match the saved blocked-keyword list. Turning the toggle off restores matching posts without deleting the list. |
+
+Click **Edit blocked keywords** beneath the keyword toggle to open the dedicated
+list manager. It supports:
+
+- Adding and removing individual keywords or phrases
+- Clearing the entire list
+- Up to 100 entries, with a maximum of 64 characters per entry
+- Unicode-normalized substring matching
+- Case-insensitive matching by default
+- An optional **Case-sensitive matching** toggle for the whole list
+- Immediate re-evaluation of posts when the list or either keyword toggle
+  changes
+
+Keyword matching checks the visible post text and quoted-post text identified by
+X's `tweetText` elements. It does not match usernames, account display names, or
+interface labels. Filtering is limited to feeds; opening an individual
+`/username/status/id` conversation leaves that post and its replies visible.
+
+### Right sidebar
+
+| Control | Default | Behavior |
+| --- | --- | --- |
+| **Hide right sidebar** | Off | Removes the entire secondary column without changing the primary feed width. |
+| **Hide search** | Off | Removes the sidebar search box. |
+| **Hide Premium card** | On | Removes the “Subscribe to Premium” sidebar card. |
+| **Hide Live on X** | Off | Removes the live-broadcasts module. |
+| **Hide Today’s News** | Off | Removes the news module. |
+| **Hide trending topics** | Off | Removes only the “Trending now” module rather than the entire sidebar. |
+| **Hide Who to follow** | Off | Removes the complete sidebar account-recommendation panel. |
+| **Hide sidebar ads** | On | Removes display-ad placements from the sidebar. |
+| **Hide footer links** | Off | Removes the sidebar footer containing X's legal and informational links. |
+
+The granular sidebar controls remove their complete layout slots, including
+borders and spacing, so hidden modules do not leave gray divider lines behind.
+Their saved values remain available when the whole-sidebar switch is enabled.
+
+### Navigation
+
+| Control | Default | Behavior |
+| --- | --- | --- |
+| **Hide Premium link** | Off | Removes Premium from X's primary navigation. |
+| **Hide Grok link** | Off | Removes Grok from X's primary navigation. |
+
+### Custom CSS, synchronization, and reset
+
+Click **Custom CSS** in the popup to open the CSS editor. Saved rules run only
+on X while the master switch is enabled. The editor accepts up to 7,000
+characters and is intended for personal styles that are too specific to become
+built-in controls.
+
+Chrome Sync stores the toggle settings, custom CSS, case-sensitivity preference,
+and blocked-keyword list. The extension uses no external service for those
+settings. **Reset all settings** in the Custom CSS page restores every toggle
+to the defaults listed above, clears custom CSS, and clears the blocked-keyword
+list.
 
 ## Install locally
 
@@ -42,20 +106,6 @@ After changing extension source files, click the extension's reload button on
 `chrome://extensions`, then refresh any open X tabs. Reloading the X page
 without first reloading the extension will continue to use the old extension
 code.
-
-## Use and customize it
-
-The toolbar popup controls the built-in enhancements. Under **Hide posts with
-keywords**, click **Edit blocked keywords** to add, remove, or clear
-phrases and choose whether matching is case-sensitive. The Feed toggle enables
-or disables filtering immediately without removing the saved list. The filter
-checks post text and quoted-post text, but not usernames or interface labels.
-Individual post-detail conversations are left visible.
-
-The whole-sidebar toggle removes only the secondary column. It intentionally
-does not change the width of the primary feed. The former Compact timeline
-feature has been removed and should not be reintroduced without an explicit
-request.
 
 ## Maintainer and AI-agent guide
 
