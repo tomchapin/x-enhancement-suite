@@ -7,7 +7,7 @@ The starter extension includes:
 
 - One-click enable/disable from the toolbar
 - Optional hiding of promoted posts, the right sidebar, trending topics,
-  Premium navigation, and Grok navigation
+  Premium promotions, and Grok navigation
 - A compact timeline mode
 - Custom CSS for personal tweaks
 - Settings synchronized through Chrome
@@ -53,6 +53,21 @@ npm run package
 
 `npm run package` creates a versioned ZIP in `dist/`. The unpacked repository
 remains the easiest way to install this private extension.
+
+### Inspect a separate debug Chrome instance
+
+For live DOM debugging without disturbing your normal browser, launch Chrome
+for Testing with a temporary profile, `--remote-debugging-port=9229`, and this
+repository passed to `--load-extension`. Then evaluate a JavaScript expression
+against its X tab through the Chrome DevTools Protocol:
+
+```sh
+npm run cdp -- 'document.title'
+```
+
+For longer probes, save the expression in a temporary file and pass
+`--file probe.js`. Set `CDP_PORT` or `CDP_URL_PREFIX` to override the default
+debugging port or target URL.
 
 ## Privacy and permissions
 

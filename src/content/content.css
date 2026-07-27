@@ -1,5 +1,5 @@
 :root[data-xes-enabled="true"][data-xes-hide-promoted-posts="true"]
-  article[data-testid="tweet"][data-xes-promoted="true"] {
+  article[data-testid="tweet"][data-xes-promoted] {
   display: none !important;
 }
 
@@ -22,9 +22,11 @@
   display: none !important;
 }
 
-:root[data-xes-enabled="true"][data-xes-hide-premium-nav="true"]
+:root[data-xes-enabled="true"][data-xes-hide-premium-promotions="true"]
   header
-  a[href^="/i/premium"] {
+  a[href^="/i/premium"],
+:root[data-xes-enabled="true"][data-xes-hide-premium-promotions="true"]
+  aside[aria-label="Subscribe to Premium"] {
   display: none !important;
 }
 

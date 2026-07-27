@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "X Enhancement Suite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Personal DOM and style enhancements for X.",
   "permissions": [
     "storage"
@@ -36,6 +36,7 @@
       ],
       "js": [
         "src/shared/settings.js",
+        "src/shared/dom-rules.js",
         "src/content/content.js"
       ],
       "run_at": "document_start"

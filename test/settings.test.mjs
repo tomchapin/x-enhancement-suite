@@ -20,6 +20,7 @@ const {
 test("defaults include a master switch and custom CSS", () => {
   assert.equal(DEFAULT_SETTINGS.enabled, true);
   assert.equal(DEFAULT_SETTINGS.customCss, "");
+  assert.equal(DEFAULT_SETTINGS.hidePremiumPromotions, true);
   assert.ok(TOGGLE_DEFINITIONS.some(({ key }) => key === "enabled"));
 });
 

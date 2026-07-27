@@ -6,20 +6,20 @@
     getSettings,
     normalizeSettings
   } = globalThis.XEnhancementSettings;
+  const { isPromotedLabel } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
     enabled: "data-xes-enabled",
     hidePromotedPosts: "data-xes-hide-promoted-posts",
     hideSidebar: "data-xes-hide-sidebar",
     hideTrends: "data-xes-hide-trends",
-    hidePremiumNav: "data-xes-hide-premium-nav",
+    hidePremiumPromotions: "data-xes-hide-premium-promotions",
     hideGrokNav: "data-xes-hide-grok-nav",
     compactTimeline: "data-xes-compact-timeline"
   });
 
   const CUSTOM_STYLE_ID = "xes-custom-styles";
   const PROMOTED_MARKER = "data-xes-promoted";
-  const PROMOTED_LABEL = /^(ad|promoted)$/i;
 
   let currentSettings;
   let observer;
@@ -62,7 +62,7 @@
   function isPromotedPost(article) {
     for (const element of article.querySelectorAll("span")) {
       const label = element.textContent?.trim();
-      if (label && PROMOTED_LABEL.test(label)) {
+      if (isPromotedLabel(label)) {
         return true;
       }
     }

@@ -8,7 +8,7 @@
     hidePromotedPosts: true,
     hideSidebar: false,
     hideTrends: false,
-    hidePremiumNav: false,
+    hidePremiumPromotions: true,
     hideGrokNav: false,
     compactTimeline: false,
     customCss: ""
@@ -36,9 +36,9 @@
       description: "Keeps the sidebar but removes trending timelines."
     },
     {
-      key: "hidePremiumNav",
-      label: "Hide Premium link",
-      description: "Removes Premium from the primary navigation."
+      key: "hidePremiumPromotions",
+      label: "Hide Premium promotions",
+      description: "Removes Premium upsells and its navigation link."
     },
     {
       key: "hideGrokNav",
