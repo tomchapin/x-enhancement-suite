@@ -12,12 +12,17 @@ const contentCss = await readFile(
   resolve(import.meta.dirname, "../src/content/content.css"),
   "utf8"
 );
+const contentScript = await readFile(
+  resolve(import.meta.dirname, "../src/content/content.js"),
+  "utf8"
+);
 const context = vm.createContext({});
 vm.runInContext(source, context);
 
 const {
   promotionTypeForLabel,
-  sidebarModuleForHeading
+  sidebarModuleForHeading,
+  feedModuleForHeading
 } = context.XEnhancementRules;
 
 test("classifies feed ads separately from boosted posts", () => {
@@ -37,9 +42,25 @@ test("recognizes sidebar modules by their headings", () => {
   assert.equal(sidebarModuleForHeading("Who to follow"), null);
 });
 
+test("recognizes only the exact inline feed recommendation heading", () => {
+  assert.equal(feedModuleForHeading("Who to follow"), "who");
+  assert.equal(feedModuleForHeading(" Who to follow "), "who");
+  assert.equal(feedModuleForHeading("Who should I follow?"), null);
+  assert.equal(feedModuleForHeading(undefined), null);
+});
+
 test("uses independent feed ad and boosted selectors", () => {
   assert.match(contentCss, /data-xes-promotion="ad"/);
   assert.match(contentCss, /data-xes-promotion="boosted"/);
+});
+
+test("targets the complete inline Who to follow timeline cell", () => {
+  assert.match(contentCss, /data-xes-hide-feed-who-to-follow/);
+  assert.match(contentCss, /data-xes-feed-module="who"/);
+  assert.match(
+    contentScript,
+    /primaryColumn"\] \[data-testid="cellInnerDiv"/
+  );
 });
 
 test("targets complete marked sidebar slots without the broad Trending wrapper", () => {

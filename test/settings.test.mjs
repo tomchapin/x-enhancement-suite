@@ -22,6 +22,7 @@ test("defaults include a master switch and custom CSS", () => {
   assert.equal(DEFAULT_SETTINGS.customCss, "");
   assert.equal(DEFAULT_SETTINGS.hideFeedAds, true);
   assert.equal(DEFAULT_SETTINGS.hideBoostedPosts, true);
+  assert.equal(DEFAULT_SETTINGS.hideFeedWhoToFollow, false);
   assert.equal(DEFAULT_SETTINGS.hideSidebarPremium, true);
   assert.equal(DEFAULT_SETTINGS.hideSidebarAds, true);
   assert.ok(TOGGLE_DEFINITIONS.some(({ key }) => key === "enabled"));
@@ -100,5 +101,16 @@ test("groups granular sidebar toggles", () => {
       "hideSidebarAds",
       "hideSidebarFooter"
     ]
+  );
+});
+
+test("groups independent feed controls", () => {
+  const feedKeys = TOGGLE_DEFINITIONS
+    .filter(({ group }) => group === "Feed")
+    .map(({ key }) => key);
+
+  assert.deepEqual(
+    [...feedKeys],
+    ["hideFeedAds", "hideBoostedPosts", "hideFeedWhoToFollow"]
   );
 });

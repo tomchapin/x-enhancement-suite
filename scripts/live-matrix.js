@@ -150,10 +150,11 @@
 
     await setAttribute("data-xes-hide-feed-ads", false);
     await setAttribute("data-xes-hide-boosted-posts", false);
+    await setAttribute("data-xes-hide-feed-who-to-follow", false);
 
     feedFixture = document.createElement("div");
     feedFixture.style.cssText =
-      "position:fixed;left:0;top:0;width:200px;height:100px;z-index:-1";
+      "position:fixed;left:0;top:0;width:200px;height:150px;z-index:-1";
     feedFixture.innerHTML = `
       <article data-testid="tweet" style="display:block;width:200px;height:40px">
         <span>Ad</span>
@@ -161,12 +162,17 @@
       <article data-testid="tweet" style="display:block;width:200px;height:40px">
         <span>Boosted</span>
       </article>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <h2 role="heading">Who to follow</h2>
+      </div>
     `;
-    document.body.append(feedFixture);
+    feed.append(feedFixture);
     await wait();
 
     const adPost = feedFixture.children[0];
     const boostedPost = feedFixture.children[1];
+    const feedWhoToFollow = feedFixture.children[2];
     assert(
       adPost.getAttribute("data-xes-promotion") === "ad",
       "MutationObserver did not classify the feed ad"
@@ -174,6 +180,10 @@
     assert(
       boostedPost.getAttribute("data-xes-promotion") === "boosted",
       "MutationObserver did not classify the Boosted post"
+    );
+    assert(
+      feedWhoToFollow.getAttribute("data-xes-feed-module") === "who",
+      "MutationObserver did not classify the inline Who to follow module"
     );
     assert(isVisible(adPost), "Feed ad should start visible");
     assert(isVisible(boostedPost), "Boosted post should start visible");
@@ -190,6 +200,30 @@
       feature: "feed filters",
       feedAdsIndependent: true,
       boostedIndependent: true
+    });
+    await setAttribute("data-xes-hide-boosted-posts", false);
+
+    assert(
+      isVisible(feedWhoToFollow),
+      "Inline Who to follow should start visible"
+    );
+    assert(
+      isVisible(slots.get("who")),
+      "Sidebar Who to follow should start visible"
+    );
+    await setAttribute("data-xes-hide-feed-who-to-follow", true);
+    assert(
+      !isVisible(feedWhoToFollow),
+      "Inline Who to follow module did not hide"
+    );
+    assert(
+      isVisible(slots.get("who")),
+      "Feed Who to follow toggle hid the sidebar module"
+    );
+    results.push({
+      feature: "feed Who to follow",
+      hidden: true,
+      sidebarPreserved: true
     });
 
     assert(

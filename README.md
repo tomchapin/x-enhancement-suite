@@ -15,6 +15,7 @@ The extension currently provides:
 
 - One-click enable/disable from the toolbar
 - Independent filtering for feed ads and Boosted posts
+- A separate filter for inline “Who to follow” recommendations in the feed
 - Granular controls for search, Premium, Live on X, news, trends, Who to
   follow, sidebar ads, and footer links
 - Independent controls for Premium and Grok navigation links
@@ -277,7 +278,8 @@ npm run live-test
 
 The matrix currently checks all built-in controls: eight granular sidebar
 slots, whole-sidebar behavior, the master switch, Premium and Grok navigation,
-independent Ad/Boosted classification and filtering, and continued absence of
+independent Ad/Boosted classification and filtering, inline “Who to follow”
+filtering without affecting the sidebar module, and continued absence of
 Compact timeline. It restores the page's original extension attributes and
 removes its synthetic feed fixtures in a `finally` block.
 

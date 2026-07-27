@@ -8,6 +8,9 @@
     "Today's News": "news",
     "Today’s News": "news"
   });
+  const FEED_MODULE_BY_HEADING = Object.freeze({
+    "Who to follow": "who"
+  });
 
   function promotionTypeForLabel(value) {
     if (typeof value !== "string") {
@@ -29,8 +32,15 @@
       : null;
   }
 
+  function feedModuleForHeading(value) {
+    return typeof value === "string"
+      ? FEED_MODULE_BY_HEADING[value.trim()] ?? null
+      : null;
+  }
+
   globalThis.XEnhancementRules = Object.freeze({
     promotionTypeForLabel,
-    sidebarModuleForHeading
+    sidebarModuleForHeading,
+    feedModuleForHeading
   });
 })();

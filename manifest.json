@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "X Enhancement Suite",
-  "version": "0.2.1",
-  "description": "Personal DOM and style enhancements for X.",
+  "version": "0.3.0",
+  "description": "Experimental (dev mode only) Chrome extension for personal X DOM enhancements.",
   "permissions": [
     "storage"
   ],

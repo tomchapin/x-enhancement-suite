@@ -8,13 +8,15 @@
   } = globalThis.XEnhancementSettings;
   const {
     promotionTypeForLabel,
-    sidebarModuleForHeading
+    sidebarModuleForHeading,
+    feedModuleForHeading
   } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
     enabled: "data-xes-enabled",
     hideFeedAds: "data-xes-hide-feed-ads",
     hideBoostedPosts: "data-xes-hide-boosted-posts",
+    hideFeedWhoToFollow: "data-xes-hide-feed-who-to-follow",
     hideSidebar: "data-xes-hide-sidebar",
     hideSidebarSearch: "data-xes-hide-sidebar-search",
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
@@ -30,6 +32,7 @@
 
   const CUSTOM_STYLE_ID = "xes-custom-styles";
   const PROMOTION_ATTRIBUTE = "data-xes-promotion";
+  const FEED_MODULE_ATTRIBUTE = "data-xes-feed-module";
   const SIDEBAR_ITEM_ATTRIBUTE = "data-xes-sidebar-item";
   const SIDEBAR_ITEM_SELECTORS = Object.freeze({
     search: 'form[role="search"][aria-label="Search"]',
@@ -115,6 +118,19 @@
     }
   }
 
+  function markFeedModules(root) {
+    for (const heading of matchingElements(root, 'h2[role="heading"]')) {
+      const moduleName = feedModuleForHeading(heading.textContent);
+      const module = heading.closest(
+        '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
+      );
+
+      if (moduleName && module) {
+        module.setAttribute(FEED_MODULE_ATTRIBUTE, moduleName);
+      }
+    }
+  }
+
   function matchingElements(root, selector) {
     const elements = new Set();
 
@@ -191,6 +207,7 @@
 
   function scanForEnhancements(root) {
     markPaidPosts(root);
+    markFeedModules(root);
     markSidebarItems(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:

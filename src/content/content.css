@@ -5,6 +5,12 @@
   display: none !important;
 }
 
+:root[data-xes-enabled="true"][data-xes-hide-feed-who-to-follow="true"]
+  [data-testid="primaryColumn"]
+  [data-xes-feed-module="who"] {
+  display: none !important;
+}
+
 :root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
   [data-testid="sidebarColumn"] {
   display: none !important;

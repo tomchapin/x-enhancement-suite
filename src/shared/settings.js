@@ -7,6 +7,7 @@
     enabled: true,
     hideFeedAds: true,
     hideBoostedPosts: true,
+    hideFeedWhoToFollow: false,
     hideSidebar: false,
     hideSidebarSearch: false,
     hideSidebarPremium: true,
@@ -38,6 +39,12 @@
       key: "hideBoostedPosts",
       label: "Hide boosted posts",
       description: "Hides posts specifically marked Boosted.",
+      group: "Feed"
+    },
+    {
+      key: "hideFeedWhoToFollow",
+      label: "Hide feed Who to follow",
+      description: "Removes inline account recommendations from the timeline.",
       group: "Feed"
     },
     {
