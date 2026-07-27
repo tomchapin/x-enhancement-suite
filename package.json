@@ -1,6 +1,6 @@
 {
   "name": "x-enhancement-suite",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "A private Chrome extension for personal X DOM enhancements.",
   "type": "module",
@@ -9,6 +9,7 @@
     "validate": "node scripts/validate.mjs",
     "package": "node scripts/package.mjs",
     "cdp": "node scripts/cdp.mjs",
+    "live-test": "node scripts/cdp.mjs --file scripts/live-matrix.js",
     "check": "npm run test && npm run validate"
   },
   "engines": {

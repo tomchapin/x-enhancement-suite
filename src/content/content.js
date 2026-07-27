@@ -15,7 +15,6 @@
     enabled: "data-xes-enabled",
     hideFeedAds: "data-xes-hide-feed-ads",
     hideBoostedPosts: "data-xes-hide-boosted-posts",
-    compactTimeline: "data-xes-compact-timeline",
     hideSidebar: "data-xes-hide-sidebar",
     hideSidebarSearch: "data-xes-hide-sidebar-search",
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
@@ -31,7 +30,15 @@
 
   const CUSTOM_STYLE_ID = "xes-custom-styles";
   const PROMOTION_ATTRIBUTE = "data-xes-promotion";
-  const SIDEBAR_MODULE_ATTRIBUTE = "data-xes-sidebar-module";
+  const SIDEBAR_ITEM_ATTRIBUTE = "data-xes-sidebar-item";
+  const SIDEBAR_ITEM_SELECTORS = Object.freeze({
+    search: 'form[role="search"][aria-label="Search"]',
+    premium: 'aside[aria-label="Subscribe to Premium"]',
+    trends: 'section:has([aria-label="Timeline: Trending now"])',
+    who: 'aside[aria-label="Who to follow"]',
+    ads: '[data-testid$="SspAd"]',
+    footer: 'nav[aria-label="Footer"]'
+  });
 
   let currentSettings;
   let observer;
@@ -108,7 +115,55 @@
     }
   }
 
-  function markSidebarModules(root) {
+  function matchingElements(root, selector) {
+    const elements = new Set();
+
+    if (root instanceof Element && root.matches(selector)) {
+      elements.add(root);
+    }
+
+    if (typeof root.querySelectorAll === "function") {
+      for (const element of root.querySelectorAll(selector)) {
+        elements.add(element);
+      }
+    }
+
+    return elements;
+  }
+
+  function sidebarSlotFor(element) {
+    const region = element.closest(
+      '[data-testid="sidebarColumn"] [aria-label="Trending"]'
+    );
+
+    if (!region) {
+      return null;
+    }
+
+    let slot = element;
+
+    while (
+      slot.parentElement &&
+      slot.parentElement.parentElement !== region
+    ) {
+      slot = slot.parentElement;
+    }
+
+    return slot.parentElement?.parentElement === region ? slot : null;
+  }
+
+  function markSidebarItem(element, itemName) {
+    const slot = sidebarSlotFor(element);
+    slot?.setAttribute(SIDEBAR_ITEM_ATTRIBUTE, itemName);
+  }
+
+  function markSidebarItems(root) {
+    for (const [itemName, selector] of Object.entries(SIDEBAR_ITEM_SELECTORS)) {
+      for (const element of matchingElements(root, selector)) {
+        markSidebarItem(element, itemName);
+      }
+    }
+
     const headings = new Set();
 
     if (
@@ -128,18 +183,15 @@
       const moduleName = sidebarModuleForHeading(heading.textContent);
       const module = heading.parentElement?.parentElement;
 
-      if (
-        moduleName &&
-        module?.closest('[data-testid="sidebarColumn"]')
-      ) {
-        module.setAttribute(SIDEBAR_MODULE_ATTRIBUTE, moduleName);
+      if (moduleName && module) {
+        markSidebarItem(module, moduleName);
       }
     }
   }
 
   function scanForEnhancements(root) {
     markPaidPosts(root);
-    markSidebarModules(root);
+    markSidebarItems(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:
     // X reuses and rerenders timeline nodes as users navigate and scroll.

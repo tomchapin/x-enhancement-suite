@@ -10,35 +10,30 @@
   display: none !important;
 }
 
-:root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
-  [data-testid="primaryColumn"] {
-  max-width: 720px !important;
-}
-
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-search="true"]
   [data-testid="sidebarColumn"]
-  form[role="search"][aria-label="Search"],
+  [data-xes-sidebar-item="search"],
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-premium="true"]
   [data-testid="sidebarColumn"]
-  aside[aria-label="Subscribe to Premium"],
+  [data-xes-sidebar-item="premium"],
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-live="true"]
   [data-testid="sidebarColumn"]
-  [data-xes-sidebar-module="live"],
+  [data-xes-sidebar-item="live"],
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-news="true"]
   [data-testid="sidebarColumn"]
-  [data-xes-sidebar-module="news"],
+  [data-xes-sidebar-item="news"],
 :root[data-xes-enabled="true"][data-xes-hide-trends="true"]
   [data-testid="sidebarColumn"]
-  section:has([aria-label="Timeline: Trending now"]),
+  [data-xes-sidebar-item="trends"],
 :root[data-xes-enabled="true"][data-xes-hide-who-to-follow="true"]
   [data-testid="sidebarColumn"]
-  aside[aria-label="Who to follow"],
+  [data-xes-sidebar-item="who"],
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-ads="true"]
   [data-testid="sidebarColumn"]
-  [data-testid$="SspAd"],
+  [data-xes-sidebar-item="ads"],
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-footer="true"]
   [data-testid="sidebarColumn"]
-  nav[aria-label="Footer"] {
+  [data-xes-sidebar-item="footer"] {
   display: none !important;
 }
 
@@ -55,61 +50,4 @@
   header
   a[href^="/i/grok"] {
   display: none !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  [data-testid="cellInnerDiv"]
-  article[data-testid="tweet"] {
-  padding: 0 10px !important;
-  font-size: 14px !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  [data-testid="tweetText"] {
-  margin-top: 2px !important;
-  font-size: 14px !important;
-  line-height: 18px !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  div:has(> div > [data-testid="reply"]) {
-  margin-top: 6px !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  [data-testid="tweetPhoto"],
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  [data-testid="videoPlayer"] {
-  max-height: 240px !important;
-  overflow: hidden !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  div:has([data-testid="tweetPhoto"]):not(:has([data-testid="tweetText"])),
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  div:has([data-testid="videoPlayer"]):not(:has([data-testid="tweetText"])) {
-  max-height: 240px !important;
-  overflow: hidden !important;
-}
-
-:root[data-xes-enabled="true"][data-xes-compact-timeline="true"]
-  [data-testid="primaryColumn"]
-  article[data-testid="tweet"]
-  :is([data-testid="tweetPhoto"], [data-testid="videoPlayer"])
-  :is(img, video) {
-  max-height: 240px !important;
-  object-fit: cover !important;
 }

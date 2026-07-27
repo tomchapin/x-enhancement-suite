@@ -9,7 +9,6 @@ The starter extension includes:
 - Independent filtering for feed ads and Boosted posts
 - Granular controls for search, Premium, Live on X, news, trends, Who to
   follow, sidebar ads, and footer links
-- A denser compact timeline mode with smaller media previews
 - Custom CSS for personal tweaks
 - Settings synchronized through Chrome
 - Live updates in already-open X tabs
@@ -69,6 +68,17 @@ npm run cdp -- 'document.title'
 For longer probes, save the expression in a temporary file and pass
 `--file probe.js`. Set `CDP_PORT` or `CDP_URL_PREFIX` to override the default
 debugging port or target URL.
+
+With an authenticated X tab open in that isolated browser, run the complete
+live feature matrix:
+
+```sh
+npm run live-test
+```
+
+The matrix verifies every toggle, complete sidebar-slot collapse, sibling
+preservation, unchanged feed width, independent Ad/Boosted filtering, and
+master-switch behavior.
 
 ## Privacy and permissions
 

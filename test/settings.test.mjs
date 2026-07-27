@@ -59,6 +59,18 @@ test("every toggle maps to a boolean setting", () => {
   }
 });
 
+test("compact timeline is no longer exposed or normalized", () => {
+  assert.equal("compactTimeline" in DEFAULT_SETTINGS, false);
+  assert.equal(
+    TOGGLE_DEFINITIONS.some(({ key }) => key === "compactTimeline"),
+    false
+  );
+  assert.equal(
+    "compactTimeline" in normalizeSettings({ compactTimeline: true }),
+    false
+  );
+});
+
 test("migrates combined paid-content and Premium settings", () => {
   const settings = normalizeSettings({
     hidePromotedPosts: false,

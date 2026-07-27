@@ -7,7 +7,6 @@
     enabled: true,
     hideFeedAds: true,
     hideBoostedPosts: true,
-    compactTimeline: false,
     hideSidebar: false,
     hideSidebarSearch: false,
     hideSidebarPremium: true,
@@ -39,12 +38,6 @@
       key: "hideBoostedPosts",
       label: "Hide boosted posts",
       description: "Hides posts specifically marked Boosted.",
-      group: "Feed"
-    },
-    {
-      key: "compactTimeline",
-      label: "Compact timeline",
-      description: "Condenses text, spacing, controls, and media previews.",
       group: "Feed"
     },
     {

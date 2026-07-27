@@ -42,13 +42,31 @@ test("uses independent feed ad and boosted selectors", () => {
   assert.match(contentCss, /data-xes-promotion="boosted"/);
 });
 
-test("targets granular sidebar modules without the broad Trending wrapper", () => {
-  assert.match(contentCss, /Timeline: Trending now/);
-  assert.match(contentCss, /data-testid\$="SspAd"/);
-  assert.match(contentCss, /aria-label="Who to follow"/);
+test("targets complete marked sidebar slots without the broad Trending wrapper", () => {
+  for (const item of [
+    "search",
+    "premium",
+    "live",
+    "news",
+    "trends",
+    "who",
+    "ads",
+    "footer"
+  ]) {
+    assert.match(contentCss, new RegExp(`data-xes-sidebar-item="${item}"`));
+  }
+
   assert.doesNotMatch(contentCss, /aria-label\*="Trending"/);
 });
 
-test("compact mode caps media previews", () => {
-  assert.match(contentCss, /max-height: 240px !important/);
+test("compact timeline feature is completely removed", () => {
+  assert.doesNotMatch(contentCss, /compact-timeline/);
+  assert.doesNotMatch(contentCss, /max-height: 240px/);
+});
+
+test("hiding the sidebar does not resize the primary feed", () => {
+  assert.doesNotMatch(
+    contentCss,
+    /data-xes-hide-sidebar[\s\S]*?\[data-testid="primaryColumn"\]/
+  );
 });
