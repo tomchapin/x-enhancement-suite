@@ -115,7 +115,8 @@ same area repeatedly.
   cell in that sequence and stop before the following post.
 - Identify the post-analytics promotion by both its exact heading and its
   `/i/account_analytics` action. Hide the complete card margin wrapper, not the
-  surrounding post.
+  surrounding post. Keep the marker-independent `:has()` fallback so an
+  asynchronous marker race cannot leave the card visible.
 - Scope sidebar rules to `[data-testid="sidebarColumn"]`.
 - Hide the complete sidebar slot, not merely its inner `<aside>`, `<section>`,
   or heading. Hiding only the semantic child leaves X's rounded border or a

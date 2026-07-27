@@ -101,6 +101,11 @@ test("targets the complete marked new-posts overlay", () => {
 test("targets the complete post-analytics promotion wrapper", () => {
   assert.match(contentCss, /data-xes-hide-post-analytics-promotions/);
   assert.match(contentCss, /data-xes-promotion-card="post-analytics"/);
+  assert.match(
+    contentCss,
+    /div:has\(> div > button\[role="button"\]\):has\(/
+  );
+  assert.match(contentCss, /a\[href="\/i\/account_analytics"\]/);
   assert.match(contentScript, /a\[href="\/i\/account_analytics"\]/);
   assert.match(contentScript, /element\.matches\('button\[role="button"\]'\)/);
   assert.match(contentScript, /containingArticle\?\.querySelector/);

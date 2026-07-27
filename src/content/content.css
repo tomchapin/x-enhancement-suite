@@ -19,7 +19,13 @@
 
 :root[data-xes-enabled="true"][data-xes-hide-post-analytics-promotions="true"]
   [data-testid="primaryColumn"]
-  [data-xes-promotion-card="post-analytics"] {
+  [data-xes-promotion-card="post-analytics"],
+:root[data-xes-enabled="true"][data-xes-hide-post-analytics-promotions="true"]
+  [data-testid="primaryColumn"]
+  article[data-testid="tweet"]
+  div:has(> div > button[role="button"]):has(
+    a[href="/i/account_analytics"]
+  ) {
   display: none !important;
 }
 

@@ -352,6 +352,7 @@
       "Post-analytics promotion should start visible"
     );
     assert(isVisible(analyticsPostBody), "Synthetic post body should be visible");
+    analyticsPromotion.removeAttribute("data-xes-promotion-card");
     await setAttribute("data-xes-hide-post-analytics-promotions", true);
     const hiddenPromotionRect = analyticsPromotion.getBoundingClientRect();
     assert(
@@ -367,6 +368,7 @@
     results.push({
       feature: "post-analytics promotion",
       hiddenRect: [hiddenPromotionRect.width, hiddenPromotionRect.height],
+      markerIndependent: true,
       surroundingPostPreserved: true
     });
     await setAttribute("data-xes-hide-post-analytics-promotions", false);
