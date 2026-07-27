@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blocked keywords · X Enhancement Suite</title>
+    <link rel="stylesheet" href="keywords.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="../../assets/icon-128.png" alt="" width="64" height="64">
+        <div>
+          <p class="eyebrow">X Enhancement Suite</p>
+          <h1>Blocked keywords</h1>
+          <p class="intro">
+            Automatically hide feed posts containing topics you do not want to see.
+          </p>
+        </div>
+      </header>
+
+      <section class="panel" aria-labelledby="add-heading">
+        <h2 id="add-heading">Add a keyword or phrase</h2>
+        <p class="hint">
+          Matching checks post text, including quoted posts. Usernames and
+          interface labels are ignored.
+        </p>
+
+        <label class="matching-option" for="case-sensitive">
+          <span>
+            <strong>Case-sensitive matching</strong>
+            <small>When on, “Apple” will not match “apple”.</small>
+          </span>
+          <span class="switch">
+            <input id="case-sensitive" type="checkbox">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <form id="keyword-form">
+          <input
+            id="keyword"
+            type="text"
+            maxlength="64"
+            autocomplete="off"
+            placeholder="Example: unwanted topic"
+            aria-label="Keyword or phrase"
+          >
+          <button class="primary" type="submit">Add keyword</button>
+        </form>
+        <p id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel list-panel" aria-labelledby="list-heading">
+        <div class="list-heading">
+          <div>
+            <h2 id="list-heading">Your blocked list</h2>
+            <p id="count" class="count">0 keywords</p>
+          </div>
+          <button id="clear-all" class="danger" type="button">Clear all</button>
+        </div>
+
+        <p id="empty-state" class="empty-state">
+          No blocked keywords yet. Add one above to start filtering your feed.
+        </p>
+        <ul id="keyword-list" aria-label="Blocked keywords"></ul>
+      </section>
+
+      <aside>
+        Up to 100 keywords are stored in Chrome Sync. Changes apply immediately
+        to open X feeds.
+      </aside>
+    </main>
+
+    <script src="../shared/settings.js"></script>
+    <script src="keywords.js"></script>
+  </body>
+</html>

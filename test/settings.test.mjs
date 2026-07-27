@@ -12,8 +12,12 @@ const context = vm.createContext({});
 vm.runInContext(source, context);
 
 const {
+  BLOCKED_KEYWORDS_STORAGE_KEY,
   DEFAULT_SETTINGS,
+  MAX_BLOCKED_KEYWORDS,
+  MAX_BLOCKED_KEYWORD_LENGTH,
   TOGGLE_DEFINITIONS,
+  normalizeBlockedKeywords,
   normalizeSettings
 } = context.XEnhancementSettings;
 
@@ -25,9 +29,51 @@ test("defaults include a master switch and custom CSS", () => {
   assert.equal(DEFAULT_SETTINGS.hideFeedWhoToFollow, false);
   assert.equal(DEFAULT_SETTINGS.hideNewPostsPopup, false);
   assert.equal(DEFAULT_SETTINGS.hidePostAnalyticsPromotions, false);
+  assert.equal(DEFAULT_SETTINGS.hideKeywordPosts, true);
+  assert.equal(DEFAULT_SETTINGS.blockedKeywordsCaseSensitive, false);
   assert.equal(DEFAULT_SETTINGS.hideSidebarPremium, true);
   assert.equal(DEFAULT_SETTINGS.hideSidebarAds, true);
   assert.ok(TOGGLE_DEFINITIONS.some(({ key }) => key === "enabled"));
+});
+
+test("normalizes, trims, and deduplicates blocked keywords", () => {
+  assert.equal(BLOCKED_KEYWORDS_STORAGE_KEY, "blockedKeywords");
+  assert.deepEqual(
+    [...normalizeBlockedKeywords([
+      "  Artificial Intelligence  ",
+      "artificial intelligence",
+      "ＡＩ",
+      "AI",
+      "",
+      null
+    ])],
+    ["Artificial Intelligence", "AI"]
+  );
+});
+
+test("case-sensitive keyword lists preserve differently cased entries", () => {
+  assert.deepEqual(
+    [...normalizeBlockedKeywords(["Apple", "apple", "Apple"], true)],
+    ["Apple", "apple"]
+  );
+});
+
+test("blocked keyword limits fit safely within one sync storage item", () => {
+  const oversized = Array.from(
+    { length: MAX_BLOCKED_KEYWORDS + 5 },
+    (_, index) => `${index}-${"x".repeat(MAX_BLOCKED_KEYWORD_LENGTH + 10)}`
+  );
+  const normalized = normalizeBlockedKeywords(oversized);
+
+  assert.equal(normalized.length, MAX_BLOCKED_KEYWORDS);
+  assert.ok(
+    normalized.every(
+      (keyword) => keyword.length <= MAX_BLOCKED_KEYWORD_LENGTH
+    )
+  );
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(normalized), "utf8") < 8192
+  );
 });
 
 test("normalizeSettings keeps valid values", () => {
@@ -121,11 +167,21 @@ test("groups independent feed controls", () => {
       "hideBoostedPosts",
       "hideFeedWhoToFollow",
       "hideNewPostsPopup",
-      "hidePostAnalyticsPromotions"
+      "hidePostAnalyticsPromotions",
+      "hideKeywordPosts"
     ]
   );
   assert.equal(
     whoToFollowToggle.label,
     "Hide Who to Follow from feed"
+  );
+  assert.equal(
+    TOGGLE_DEFINITIONS.find(({ key }) => key === "hideKeywordPosts")
+      .actionLabel,
+    "Edit blocked keywords"
+  );
+  assert.equal(
+    TOGGLE_DEFINITIONS.find(({ key }) => key === "hideKeywordPosts").label,
+    "Hide posts with keywords"
   );
 });

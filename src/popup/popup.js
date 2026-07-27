@@ -54,6 +54,22 @@
 
     switchLabel.append(input, switchVisual);
     row.append(labelText, description, switchLabel);
+
+    if (definition.actionPage) {
+      const action = document.createElement("button");
+      action.id = "open-keywords";
+      action.className = "setting-action";
+      action.type = "button";
+      action.textContent = definition.actionLabel;
+      action.addEventListener("click", () => {
+        chrome.tabs.create({
+          url: chrome.runtime.getURL(definition.actionPage)
+        });
+      });
+      row.classList.add("has-action");
+      row.append(action);
+    }
+
     return row;
   }
 

@@ -51,11 +51,51 @@
     );
   }
 
+  function findBlockedKeyword(
+    textValues,
+    blockedKeywords,
+    caseSensitive = false
+  ) {
+    if (!Array.isArray(textValues) || !Array.isArray(blockedKeywords)) {
+      return null;
+    }
+
+    let text = textValues
+      .filter((value) => typeof value === "string")
+      .join("\n")
+      .normalize("NFKC");
+
+    if (!text) {
+      return null;
+    }
+
+    if (!caseSensitive) {
+      text = text.toLocaleLowerCase();
+    }
+
+    return (
+      blockedKeywords.find((keyword) => {
+        if (typeof keyword !== "string") {
+          return false;
+        }
+
+        let normalizedKeyword = keyword.normalize("NFKC").trim();
+
+        if (!caseSensitive) {
+          normalizedKeyword = normalizedKeyword.toLocaleLowerCase();
+        }
+
+        return normalizedKeyword && text.includes(normalizedKeyword);
+      }) ?? null
+    );
+  }
+
   globalThis.XEnhancementRules = Object.freeze({
     promotionTypeForLabel,
     sidebarModuleForHeading,
     feedModuleForHeading,
     isNewPostsControlLabel,
-    isPostAnalyticsPromotionLabel
+    isPostAnalyticsPromotionLabel,
+    findBlockedKeyword
   });
 })();

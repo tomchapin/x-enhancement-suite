@@ -153,6 +153,7 @@
     await setAttribute("data-xes-hide-feed-who-to-follow", false);
     await setAttribute("data-xes-hide-new-posts-popup", false);
     await setAttribute("data-xes-hide-post-analytics-promotions", false);
+    await setAttribute("data-xes-hide-keyword-posts", false);
 
     feedFixture = document.createElement("div");
     feedFixture.style.cssText =
@@ -224,6 +225,18 @@
           </div>
         </div>
       </article>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <article data-testid="tweet">
+          <div data-testid="tweetText">Blocked topic post</div>
+        </article>
+      </div>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <article data-testid="tweet">
+          <div data-testid="tweetText">Ordinary visible post</div>
+        </article>
+      </div>
     `);
     await wait();
 
@@ -245,6 +258,8 @@
     const analyticsPromotion = analyticsPost.querySelector(
       '[data-xes-test="analytics-promotion-wrapper"]'
     );
+    const keywordBlockedCell = feedFixture.children[10];
+    const keywordVisibleCell = feedFixture.children[11];
     assert(
       adPost.getAttribute("data-xes-promotion") === "ad",
       "MutationObserver did not classify the feed ad"
@@ -278,6 +293,7 @@
     );
     assert(isVisible(adPost), "Feed ad should start visible");
     assert(isVisible(boostedPost), "Boosted post should start visible");
+    keywordBlockedCell.setAttribute("data-xes-keyword-blocked", "");
 
     await setAttribute("data-xes-hide-feed-ads", true);
     assert(!isVisible(adPost), "Feed ad did not hide");
@@ -372,6 +388,29 @@
       surroundingPostPreserved: true
     });
     await setAttribute("data-xes-hide-post-analytics-promotions", false);
+
+    assert(
+      isVisible(keywordBlockedCell) && isVisible(keywordVisibleCell),
+      "Synthetic keyword posts should start visible"
+    );
+    await setAttribute("data-xes-hide-keyword-posts", true);
+    const hiddenKeywordRect = keywordBlockedCell.getBoundingClientRect();
+    assert(
+      getComputedStyle(keywordBlockedCell).display === "none" &&
+        hiddenKeywordRect.width === 0 &&
+        hiddenKeywordRect.height === 0,
+      "Keyword filter left a visible feed-cell shell"
+    );
+    assert(
+      isVisible(keywordVisibleCell),
+      "Keyword filter hid an unmarked feed post"
+    );
+    results.push({
+      feature: "blocked keywords",
+      hiddenRect: [hiddenKeywordRect.width, hiddenKeywordRect.height],
+      unmarkedPostPreserved: true
+    });
+    await setAttribute("data-xes-hide-keyword-posts", false);
 
     assert(
       !root.hasAttribute("data-xes-compact-timeline"),

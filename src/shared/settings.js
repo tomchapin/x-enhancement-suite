@@ -2,6 +2,9 @@
   "use strict";
 
   const STORAGE_KEY = "settings";
+  const BLOCKED_KEYWORDS_STORAGE_KEY = "blockedKeywords";
+  const MAX_BLOCKED_KEYWORDS = 100;
+  const MAX_BLOCKED_KEYWORD_LENGTH = 64;
 
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
@@ -10,6 +13,8 @@
     hideFeedWhoToFollow: false,
     hideNewPostsPopup: false,
     hidePostAnalyticsPromotions: false,
+    hideKeywordPosts: true,
+    blockedKeywordsCaseSensitive: false,
     hideSidebar: false,
     hideSidebarSearch: false,
     hideSidebarPremium: true,
@@ -61,6 +66,14 @@
       description:
         "Removes post-analytics Premium upsells from feeds and posts.",
       group: "Feed"
+    },
+    {
+      key: "hideKeywordPosts",
+      label: "Hide posts with keywords",
+      description: "Filters feed posts using your blocked keyword list.",
+      group: "Feed",
+      actionLabel: "Edit blocked keywords",
+      actionPage: "src/keywords/keywords.html"
     },
     {
       key: "hideSidebar",
@@ -174,6 +187,40 @@
     return normalized;
   }
 
+  function normalizeBlockedKeywords(value, caseSensitive = false) {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    const normalized = [];
+    const seen = new Set();
+
+    for (const candidate of value) {
+      if (typeof candidate !== "string") {
+        continue;
+      }
+
+      const keyword = candidate
+        .normalize("NFKC")
+        .trim()
+        .slice(0, MAX_BLOCKED_KEYWORD_LENGTH);
+      const key = caseSensitive ? keyword : keyword.toLocaleLowerCase();
+
+      if (!keyword || seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      normalized.push(keyword);
+
+      if (normalized.length === MAX_BLOCKED_KEYWORDS) {
+        break;
+      }
+    }
+
+    return normalized;
+  }
+
   async function getSettings() {
     const stored = await chrome.storage.sync.get(STORAGE_KEY);
     return normalizeSettings(stored[STORAGE_KEY]);
@@ -186,19 +233,44 @@
     return next;
   }
 
+  async function getBlockedKeywords(caseSensitive = false) {
+    const stored = await chrome.storage.sync.get(BLOCKED_KEYWORDS_STORAGE_KEY);
+    return normalizeBlockedKeywords(
+      stored[BLOCKED_KEYWORDS_STORAGE_KEY],
+      caseSensitive
+    );
+  }
+
+  async function setBlockedKeywords(value, caseSensitive = false) {
+    const blockedKeywords = normalizeBlockedKeywords(value, caseSensitive);
+    await chrome.storage.sync.set({
+      [BLOCKED_KEYWORDS_STORAGE_KEY]: blockedKeywords
+    });
+    return blockedKeywords;
+  }
+
   async function resetSettings() {
     const defaults = normalizeSettings(DEFAULT_SETTINGS);
-    await chrome.storage.sync.set({ [STORAGE_KEY]: defaults });
+    await chrome.storage.sync.set({
+      [STORAGE_KEY]: defaults,
+      [BLOCKED_KEYWORDS_STORAGE_KEY]: []
+    });
     return defaults;
   }
 
   globalThis.XEnhancementSettings = Object.freeze({
     STORAGE_KEY,
+    BLOCKED_KEYWORDS_STORAGE_KEY,
+    MAX_BLOCKED_KEYWORDS,
+    MAX_BLOCKED_KEYWORD_LENGTH,
     DEFAULT_SETTINGS,
     TOGGLE_DEFINITIONS,
     normalizeSettings,
+    normalizeBlockedKeywords,
     getSettings,
     setSettings,
+    getBlockedKeywords,
+    setBlockedKeywords,
     resetSettings
   });
 })();

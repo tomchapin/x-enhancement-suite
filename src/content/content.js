@@ -3,7 +3,10 @@
 
   const {
     STORAGE_KEY,
+    BLOCKED_KEYWORDS_STORAGE_KEY,
     getSettings,
+    getBlockedKeywords,
+    normalizeBlockedKeywords,
     normalizeSettings
   } = globalThis.XEnhancementSettings;
   const {
@@ -11,7 +14,8 @@
     sidebarModuleForHeading,
     feedModuleForHeading,
     isNewPostsControlLabel,
-    isPostAnalyticsPromotionLabel
+    isPostAnalyticsPromotionLabel,
+    findBlockedKeyword
   } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
@@ -22,6 +26,7 @@
     hideNewPostsPopup: "data-xes-hide-new-posts-popup",
     hidePostAnalyticsPromotions:
       "data-xes-hide-post-analytics-promotions",
+    hideKeywordPosts: "data-xes-hide-keyword-posts",
     hideSidebar: "data-xes-hide-sidebar",
     hideSidebarSearch: "data-xes-hide-sidebar-search",
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
@@ -40,6 +45,7 @@
   const FEED_MODULE_ATTRIBUTE = "data-xes-feed-module";
   const FEED_OVERLAY_ATTRIBUTE = "data-xes-feed-overlay";
   const PROMOTION_CARD_ATTRIBUTE = "data-xes-promotion-card";
+  const KEYWORD_BLOCKED_ATTRIBUTE = "data-xes-keyword-blocked";
   const SIDEBAR_ITEM_ATTRIBUTE = "data-xes-sidebar-item";
   const SIDEBAR_ITEM_SELECTORS = Object.freeze({
     search: 'form[role="search"][aria-label="Search"]',
@@ -51,6 +57,7 @@
   });
 
   let currentSettings;
+  let currentBlockedKeywords = [];
   let observer;
 
   function applySettings(settings) {
@@ -286,6 +293,54 @@
     }
   }
 
+  function isFeedPost(article) {
+    return (
+      article.closest(
+        '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
+      ) &&
+      !/^\/[^/]+\/status\/\d+(?:\/|$)/.test(location.pathname)
+    );
+  }
+
+  function markKeywordPosts(root) {
+    const articles = new Set();
+
+    if (root instanceof Element) {
+      const containingArticle = root.closest('article[data-testid="tweet"]');
+      if (containingArticle) {
+        articles.add(containingArticle);
+      }
+    }
+
+    if (typeof root.querySelectorAll === "function") {
+      for (const article of root.querySelectorAll('article[data-testid="tweet"]')) {
+        articles.add(article);
+      }
+    }
+
+    for (const article of articles) {
+      const cell = article.closest(
+        '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
+      );
+
+      if (!cell) {
+        continue;
+      }
+
+      const textValues = [...article.querySelectorAll('[data-testid="tweetText"]')]
+        .map((element) => element.textContent);
+      const blockedKeyword = isFeedPost(article)
+        ? findBlockedKeyword(
+            textValues,
+            currentBlockedKeywords,
+            currentSettings.blockedKeywordsCaseSensitive
+          )
+        : null;
+
+      cell.toggleAttribute(KEYWORD_BLOCKED_ATTRIBUTE, Boolean(blockedKeyword));
+    }
+  }
+
   function matchingElements(root, selector) {
     const elements = new Set();
 
@@ -365,6 +420,7 @@
     markFeedModules(root);
     markFeedOverlays(root);
     markPromotionCards(root);
+    markKeywordPosts(root);
     markSidebarItems(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:
@@ -393,15 +449,31 @@
   }
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== "sync" || !changes[STORAGE_KEY]) {
+    if (areaName !== "sync") {
       return;
     }
 
-    applySettings(changes[STORAGE_KEY].newValue);
+    if (changes[STORAGE_KEY]) {
+      applySettings(changes[STORAGE_KEY].newValue);
+    }
+
+    if (changes[BLOCKED_KEYWORDS_STORAGE_KEY]) {
+      currentBlockedKeywords = normalizeBlockedKeywords(
+        changes[BLOCKED_KEYWORDS_STORAGE_KEY].newValue,
+        currentSettings?.blockedKeywordsCaseSensitive
+      );
+
+      if (currentSettings?.enabled) {
+        scanForEnhancements(document);
+      }
+    }
   });
 
   getSettings()
-    .then((settings) => {
+    .then(async (settings) => {
+      currentBlockedKeywords = await getBlockedKeywords(
+        settings.blockedKeywordsCaseSensitive
+      );
       applySettings(settings);
       startObserver();
     })

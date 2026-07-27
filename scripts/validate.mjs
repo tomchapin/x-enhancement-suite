@@ -25,6 +25,7 @@ assert.deepEqual(
 const referencedFiles = new Set([
   manifest.action.default_popup,
   manifest.options_page,
+  "src/keywords/keywords.html",
   ...Object.values(manifest.icons),
   ...Object.values(manifest.action.default_icon)
 ]);
@@ -39,7 +40,11 @@ for (const file of referencedFiles) {
   await access(resolve(root, file));
 }
 
-for (const htmlFile of [manifest.action.default_popup, manifest.options_page]) {
+for (const htmlFile of [
+  manifest.action.default_popup,
+  manifest.options_page,
+  "src/keywords/keywords.html"
+]) {
   const html = await readFile(resolve(root, htmlFile), "utf8");
   assert.ok(
     !/\b(?:src|href)=["']https?:\/\//i.test(html),

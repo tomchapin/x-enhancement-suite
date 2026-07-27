@@ -24,7 +24,8 @@ const {
   sidebarModuleForHeading,
   feedModuleForHeading,
   isNewPostsControlLabel,
-  isPostAnalyticsPromotionLabel
+  isPostAnalyticsPromotionLabel,
+  findBlockedKeyword
 } = context.XEnhancementRules;
 
 test("classifies feed ads separately from boosted posts", () => {
@@ -74,6 +75,26 @@ test("recognizes only the post-analytics promotion heading", () => {
   assert.equal(isPostAnalyticsPromotionLabel(undefined), false);
 });
 
+test("matches blocked keywords against post text only", () => {
+  assert.equal(
+    findBlockedKeyword(
+      ["A post about Artificial Intelligence", "Quoted post"],
+      ["sports", "artificial intelligence"]
+    ),
+    "artificial intelligence"
+  );
+  assert.equal(findBlockedKeyword(["Unicode ＡＩ"], ["ai"]), "ai");
+  assert.equal(findBlockedKeyword(["Concatenate this"], ["cat"]), "cat");
+  assert.equal(findBlockedKeyword(["Nothing relevant"], ["sports"]), null);
+  assert.equal(findBlockedKeyword(undefined, ["sports"]), null);
+});
+
+test("optionally matches blocked keywords with case sensitivity", () => {
+  assert.equal(findBlockedKeyword(["An Apple post"], ["Apple"], true), "Apple");
+  assert.equal(findBlockedKeyword(["An apple post"], ["Apple"], true), null);
+  assert.equal(findBlockedKeyword(["An apple post"], ["Apple"], false), "Apple");
+});
+
 test("uses independent feed ad and boosted selectors", () => {
   assert.match(contentCss, /data-xes-promotion="ad"/);
   assert.match(contentCss, /data-xes-promotion="boosted"/);
@@ -110,6 +131,15 @@ test("targets the complete post-analytics promotion wrapper", () => {
   assert.match(contentScript, /element\.matches\('button\[role="button"\]'\)/);
   assert.match(contentScript, /containingArticle\?\.querySelector/);
   assert.match(contentScript, /wrapper\.children\.length === 1/);
+});
+
+test("targets complete feed cells for keyword matches", () => {
+  assert.match(contentCss, /data-xes-hide-keyword-posts/);
+  assert.match(contentCss, /data-xes-keyword-blocked/);
+  assert.match(contentCss, /data-testid="cellInnerDiv"/);
+  assert.match(contentScript, /data-testid="tweetText"/);
+  assert.match(contentScript, /findBlockedKeyword/);
+  assert.match(contentScript, /status\\\/\\d\+/);
 });
 
 test("targets complete marked sidebar slots without the broad Trending wrapper", () => {

@@ -42,7 +42,7 @@
 
   document.getElementById("reset").addEventListener("click", async () => {
     const confirmed = window.confirm(
-      "Reset every extension setting, including custom CSS?"
+      "Reset every extension setting, including custom CSS and blocked keywords?"
     );
 
     if (!confirmed) {

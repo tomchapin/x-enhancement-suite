@@ -19,6 +19,8 @@ The extension currently provides:
 - A separate filter for the blue new-posts scroll-to-top popup
 - A separate filter for post-analytics Premium promotions in feeds and post
   detail views
+- A blocked-keyword filter with optional case-sensitive matching and a
+  dedicated list-management page
 - Granular controls for search, Premium, Live on X, news, trends, Who to
   follow, sidebar ads, and footer links
 - Independent controls for Premium and Grok navigation links
@@ -43,8 +45,12 @@ code.
 
 ## Use and customize it
 
-The toolbar popup controls the built-in enhancements. Click **Custom CSS** in
-the popup to add personal styles without changing source files.
+The toolbar popup controls the built-in enhancements. Under **Hide posts with
+keywords**, click **Edit blocked keywords** to add, remove, or clear
+phrases and choose whether matching is case-sensitive. The Feed toggle enables
+or disables filtering immediately without removing the saved list. The filter
+checks post text and quoted-post text, but not usernames or interface labels.
+Individual post-detail conversations are left visible.
 
 The whole-sidebar toggle removes only the secondary column. It intentionally
 does not change the width of the primary feed. The former Compact timeline
@@ -68,6 +74,7 @@ hidden.
 | `src/content/content.js` | Root attributes, DOM discovery, markers, and MutationObserver |
 | `src/content/content.css` | Built-in visual rules gated by root attributes |
 | `src/popup/` | Generated toggle UI and settings updates |
+| `src/keywords/` | Blocked-keyword list management page |
 | `src/options/` | Custom CSS editor and reset UI |
 | `test/` | Dependency-free Node regression tests |
 | `scripts/cdp.mjs` | Evaluate JavaScript in the isolated debug X tab through CDP |
@@ -95,6 +102,13 @@ of a toggle in the popup HTML. `normalizeSettings()` deliberately strips
 unknown keys and invalid value types. Add a migration there when renaming or
 splitting a previously stored setting.
 
+Blocked keywords deliberately use their own Chrome Sync key instead of the
+general settings object. This keeps the list independent of the custom-CSS
+payload and below Chrome Sync's per-item quota. Use
+`normalizeBlockedKeywords()`, `getBlockedKeywords()`, and
+`setBlockedKeywords()` rather than reading or writing that storage item
+directly.
+
 Content transformations must be idempotent. X inserts, removes, and reuses DOM
 nodes during navigation and scrolling, and `scanForEnhancements()` may see the
 same area repeatedly.
@@ -117,6 +131,12 @@ same area repeatedly.
   `/i/account_analytics` action. Hide the complete card margin wrapper, not the
   surrounding post. Keep the marker-independent `:has()` fallback so an
   asynchronous marker race cannot leave the card visible.
+- Keyword matching is Unicode-normalized substring matching against descendants
+  with `data-testid="tweetText"`. It is case-insensitive by default, with a
+  global case-sensitive option on the management page. Mark and hide the
+  complete `cellInnerDiv`; never hide only the inner article.
+- Do not apply keyword filtering on `/username/status/id` routes. The feature
+  is for feeds, not individual post-detail conversations.
 - Scope sidebar rules to `[data-testid="sidebarColumn"]`.
 - Hide the complete sidebar slot, not merely its inner `<aside>`, `<section>`,
   or heading. Hiding only the semantic child leaves X's rounded border or a
@@ -294,9 +314,10 @@ slots, whole-sidebar behavior, the master switch, Premium and Grok navigation,
 independent Ad/Boosted classification and filtering, every cell in an inline
 “Who to follow” module without affecting the sidebar or following post, the
 new-posts popup without affecting ordinary feed controls, the post-analytics
-promotion without affecting its surrounding post, and continued absence of
-Compact timeline. It restores the page's original extension attributes and
-removes its synthetic feed fixtures in a `finally` block.
+promotion without affecting its surrounding post, complete-cell keyword
+filtering without affecting an unmarked post, and continued absence of Compact
+timeline. It restores the page's original extension attributes and removes its
+synthetic feed fixtures in a `finally` block.
 
 Feed tests use temporary synthetic Ad and Boosted posts so the result does not
 depend on what X happens to serve during a particular session. Sidebar tests
@@ -336,8 +357,9 @@ ignored by Git.
 ## Privacy and permissions
 
 The extension runs only on `x.com` and `twitter.com`. It requests Chrome's
-`storage` permission solely to persist extension settings. It does not make
-network requests, collect analytics, or transmit browsing data.
+`storage` permission solely to persist extension settings, custom CSS, and the
+blocked-keyword list. It does not make network requests, collect analytics, or
+transmit browsing data.
 
 The isolated debug profile is separate from extension behavior but is still
 sensitive because it may contain cloned browsing data and authenticated

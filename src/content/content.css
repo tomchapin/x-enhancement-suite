@@ -29,6 +29,12 @@
   display: none !important;
 }
 
+:root[data-xes-enabled="true"][data-xes-hide-keyword-posts="true"]
+  [data-testid="primaryColumn"]
+  [data-testid="cellInnerDiv"][data-xes-keyword-blocked] {
+  display: none !important;
+}
+
 :root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
   [data-testid="sidebarColumn"] {
   display: none !important;
