@@ -21,6 +21,7 @@ const includedPaths = [
   "manifest.json",
   "README.md",
   "assets",
+  "docs",
   "src"
 ];
 
