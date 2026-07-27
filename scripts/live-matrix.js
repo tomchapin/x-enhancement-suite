@@ -151,10 +151,11 @@
     await setAttribute("data-xes-hide-feed-ads", false);
     await setAttribute("data-xes-hide-boosted-posts", false);
     await setAttribute("data-xes-hide-feed-who-to-follow", false);
+    await setAttribute("data-xes-hide-new-posts-popup", false);
 
     feedFixture = document.createElement("div");
     feedFixture.style.cssText =
-      "position:fixed;left:0;top:0;width:200px;height:150px;z-index:-1";
+      "position:fixed;left:0;top:0;width:200px;height:200px;z-index:-1";
     feedFixture.innerHTML = `
       <article data-testid="tweet" style="display:block;width:200px;height:40px">
         <span>Ad</span>
@@ -166,6 +167,22 @@
         style="display:block;width:200px;height:40px">
         <h2 role="heading">Who to follow</h2>
       </div>
+      <div data-xes-test="new-posts-overlay"
+        style="position:absolute;display:block;width:200px;height:40px">
+        <div role="status">
+          <button
+            aria-label="New posts are available. Push the period key to go to the them."
+            role="button"
+            style="display:block;width:160px;height:30px"
+          >See new posts</button>
+        </div>
+      </div>
+      <button
+        data-xes-test="ordinary-feed-control"
+        aria-label="Alice posted"
+        role="button"
+        style="display:block;width:160px;height:30px"
+      >Alice posted</button>
     `;
     feed.append(feedFixture);
     await wait();
@@ -173,6 +190,8 @@
     const adPost = feedFixture.children[0];
     const boostedPost = feedFixture.children[1];
     const feedWhoToFollow = feedFixture.children[2];
+    const newPostsOverlay = feedFixture.children[3];
+    const ordinaryFeedControl = feedFixture.children[4];
     assert(
       adPost.getAttribute("data-xes-promotion") === "ad",
       "MutationObserver did not classify the feed ad"
@@ -184,6 +203,14 @@
     assert(
       feedWhoToFollow.getAttribute("data-xes-feed-module") === "who",
       "MutationObserver did not classify the inline Who to follow module"
+    );
+    assert(
+      newPostsOverlay.getAttribute("data-xes-feed-overlay") === "new-posts",
+      "MutationObserver did not classify the new-posts overlay"
+    );
+    assert(
+      !ordinaryFeedControl.hasAttribute("data-xes-feed-overlay"),
+      "An ordinary feed control was misclassified as the new-posts overlay"
     );
     assert(isVisible(adPost), "Feed ad should start visible");
     assert(isVisible(boostedPost), "Boosted post should start visible");
@@ -225,6 +252,31 @@
       hidden: true,
       sidebarPreserved: true
     });
+    await setAttribute("data-xes-hide-feed-who-to-follow", false);
+
+    assert(isVisible(newPostsOverlay), "New-posts overlay should start visible");
+    assert(
+      isVisible(ordinaryFeedControl),
+      "Ordinary feed control should start visible"
+    );
+    await setAttribute("data-xes-hide-new-posts-popup", true);
+    const hiddenOverlayRect = newPostsOverlay.getBoundingClientRect();
+    assert(
+      getComputedStyle(newPostsOverlay).display === "none" &&
+        hiddenOverlayRect.width === 0 &&
+        hiddenOverlayRect.height === 0,
+      "New-posts popup left a visible overlay shell"
+    );
+    assert(
+      isVisible(ordinaryFeedControl),
+      "New-posts popup toggle hid an ordinary feed control"
+    );
+    results.push({
+      feature: "new-posts popup",
+      hiddenRect: [hiddenOverlayRect.width, hiddenOverlayRect.height],
+      ordinaryFeedControlPreserved: true
+    });
+    await setAttribute("data-xes-hide-new-posts-popup", false);
 
     assert(
       !root.hasAttribute("data-xes-compact-timeline"),

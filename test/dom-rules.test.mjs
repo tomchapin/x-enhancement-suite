@@ -22,7 +22,8 @@ vm.runInContext(source, context);
 const {
   promotionTypeForLabel,
   sidebarModuleForHeading,
-  feedModuleForHeading
+  feedModuleForHeading,
+  isNewPostsControlLabel
 } = context.XEnhancementRules;
 
 test("classifies feed ads separately from boosted posts", () => {
@@ -49,6 +50,19 @@ test("recognizes only the exact inline feed recommendation heading", () => {
   assert.equal(feedModuleForHeading(undefined), null);
 });
 
+test("recognizes X's dedicated new-posts control labels", () => {
+  assert.equal(
+    isNewPostsControlLabel(
+      "New posts are available. Push the period key to go to the them."
+    ),
+    true
+  );
+  assert.equal(isNewPostsControlLabel("See new posts"), true);
+  assert.equal(isNewPostsControlLabel("Alice posted"), false);
+  assert.equal(isNewPostsControlLabel("New posts from Alice"), false);
+  assert.equal(isNewPostsControlLabel(undefined), false);
+});
+
 test("uses independent feed ad and boosted selectors", () => {
   assert.match(contentCss, /data-xes-promotion="ad"/);
   assert.match(contentCss, /data-xes-promotion="boosted"/);
@@ -61,6 +75,13 @@ test("targets the complete inline Who to follow timeline cell", () => {
     contentScript,
     /primaryColumn"\] \[data-testid="cellInnerDiv"/
   );
+});
+
+test("targets the complete marked new-posts overlay", () => {
+  assert.match(contentCss, /data-xes-hide-new-posts-popup/);
+  assert.match(contentCss, /data-xes-feed-overlay="new-posts"/);
+  assert.match(contentScript, /position === "absolute"/);
+  assert.match(contentScript, /closest\('\[role="status"\]'\)/);
 });
 
 test("targets complete marked sidebar slots without the broad Trending wrapper", () => {

@@ -8,6 +8,7 @@
     hideFeedAds: true,
     hideBoostedPosts: true,
     hideFeedWhoToFollow: false,
+    hideNewPostsPopup: false,
     hideSidebar: false,
     hideSidebarSearch: false,
     hideSidebarPremium: true,
@@ -45,6 +46,12 @@
       key: "hideFeedWhoToFollow",
       label: "Hide feed Who to follow",
       description: "Removes inline account recommendations from the timeline.",
+      group: "Feed"
+    },
+    {
+      key: "hideNewPostsPopup",
+      label: "Hide new-posts popup",
+      description: "Removes the blue scroll-to-top notice for new posts.",
       group: "Feed"
     },
     {

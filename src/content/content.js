@@ -9,7 +9,8 @@
   const {
     promotionTypeForLabel,
     sidebarModuleForHeading,
-    feedModuleForHeading
+    feedModuleForHeading,
+    isNewPostsControlLabel
   } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
@@ -17,6 +18,7 @@
     hideFeedAds: "data-xes-hide-feed-ads",
     hideBoostedPosts: "data-xes-hide-boosted-posts",
     hideFeedWhoToFollow: "data-xes-hide-feed-who-to-follow",
+    hideNewPostsPopup: "data-xes-hide-new-posts-popup",
     hideSidebar: "data-xes-hide-sidebar",
     hideSidebarSearch: "data-xes-hide-sidebar-search",
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
@@ -33,6 +35,7 @@
   const CUSTOM_STYLE_ID = "xes-custom-styles";
   const PROMOTION_ATTRIBUTE = "data-xes-promotion";
   const FEED_MODULE_ATTRIBUTE = "data-xes-feed-module";
+  const FEED_OVERLAY_ATTRIBUTE = "data-xes-feed-overlay";
   const SIDEBAR_ITEM_ATTRIBUTE = "data-xes-sidebar-item";
   const SIDEBAR_ITEM_SELECTORS = Object.freeze({
     search: 'form[role="search"][aria-label="Search"]',
@@ -131,6 +134,44 @@
     }
   }
 
+  function newPostsOverlayFor(control) {
+    const primaryColumn = control.closest('[data-testid="primaryColumn"]');
+
+    if (!primaryColumn) {
+      return null;
+    }
+
+    const status = control.closest('[role="status"]');
+    let candidate = status ?? control;
+
+    while (
+      candidate.parentElement &&
+      candidate.parentElement !== primaryColumn
+    ) {
+      candidate = candidate.parentElement;
+      const position = getComputedStyle(candidate).position;
+
+      if (position === "absolute" || position === "fixed") {
+        return candidate;
+      }
+    }
+
+    return status ?? control;
+  }
+
+  function markFeedOverlays(root) {
+    for (const control of matchingElements(root, '[role="button"][aria-label]')) {
+      if (!isNewPostsControlLabel(control.getAttribute("aria-label"))) {
+        continue;
+      }
+
+      newPostsOverlayFor(control)?.setAttribute(
+        FEED_OVERLAY_ATTRIBUTE,
+        "new-posts"
+      );
+    }
+  }
+
   function matchingElements(root, selector) {
     const elements = new Set();
 
@@ -208,6 +249,7 @@
   function scanForEnhancements(root) {
     markPaidPosts(root);
     markFeedModules(root);
+    markFeedOverlays(root);
     markSidebarItems(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:

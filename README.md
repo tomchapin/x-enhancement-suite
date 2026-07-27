@@ -16,6 +16,7 @@ The extension currently provides:
 - One-click enable/disable from the toolbar
 - Independent filtering for feed ads and Boosted posts
 - A separate filter for inline “Who to follow” recommendations in the feed
+- A separate filter for the blue new-posts scroll-to-top popup
 - Granular controls for search, Premium, Live on X, news, trends, Who to
   follow, sidebar ads, and footer links
 - Independent controls for Premium and Grok navigation links
@@ -104,6 +105,9 @@ same area repeatedly.
 - Match paid-content labels exactly. A post marked `Ad`, `Promoted`, or
   `Sponsored` is classified separately from one marked `Boosted`.
 - Scope feed rules to `article[data-testid="tweet"]`.
+- Identify the new-posts popup by its dedicated accessibility label, then mark
+  and hide its complete positioned overlay wrapper. Do not match generic
+  visible text such as `posted`.
 - Scope sidebar rules to `[data-testid="sidebarColumn"]`.
 - Hide the complete sidebar slot, not merely its inner `<aside>`, `<section>`,
   or heading. Hiding only the semantic child leaves X's rounded border or a
@@ -279,9 +283,10 @@ npm run live-test
 The matrix currently checks all built-in controls: eight granular sidebar
 slots, whole-sidebar behavior, the master switch, Premium and Grok navigation,
 independent Ad/Boosted classification and filtering, inline “Who to follow”
-filtering without affecting the sidebar module, and continued absence of
-Compact timeline. It restores the page's original extension attributes and
-removes its synthetic feed fixtures in a `finally` block.
+filtering without affecting the sidebar module, the new-posts popup without
+affecting ordinary feed controls, and continued absence of Compact timeline.
+It restores the page's original extension attributes and removes its synthetic
+feed fixtures in a `finally` block.
 
 Feed tests use temporary synthetic Ad and Boosted posts so the result does not
 depend on what X happens to serve during a particular session. Sidebar tests

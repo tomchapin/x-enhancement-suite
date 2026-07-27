@@ -3,6 +3,7 @@
 
   const FEED_AD_LABEL = /^(ad|promoted|sponsored)$/i;
   const BOOSTED_LABEL = /^boosted$/i;
+  const NEW_POSTS_LABEL = /^(new posts are available(?:\.|$)|see new posts$)/i;
   const SIDEBAR_MODULE_BY_HEADING = Object.freeze({
     "Live on X": "live",
     "Today's News": "news",
@@ -38,9 +39,14 @@
       : null;
   }
 
+  function isNewPostsControlLabel(value) {
+    return typeof value === "string" && NEW_POSTS_LABEL.test(value.trim());
+  }
+
   globalThis.XEnhancementRules = Object.freeze({
     promotionTypeForLabel,
     sidebarModuleForHeading,
-    feedModuleForHeading
+    feedModuleForHeading,
+    isNewPostsControlLabel
   });
 })();

@@ -11,6 +11,12 @@
   display: none !important;
 }
 
+:root[data-xes-enabled="true"][data-xes-hide-new-posts-popup="true"]
+  [data-testid="primaryColumn"]
+  [data-xes-feed-overlay="new-posts"] {
+  display: none !important;
+}
+
 :root[data-xes-enabled="true"][data-xes-hide-sidebar="true"]
   [data-testid="sidebarColumn"] {
   display: none !important;
