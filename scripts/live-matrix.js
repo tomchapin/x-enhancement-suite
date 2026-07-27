@@ -152,6 +152,7 @@
     await setAttribute("data-xes-hide-boosted-posts", false);
     await setAttribute("data-xes-hide-feed-who-to-follow", false);
     await setAttribute("data-xes-hide-new-posts-popup", false);
+    await setAttribute("data-xes-hide-post-analytics-promotions", false);
 
     feedFixture = document.createElement("div");
     feedFixture.style.cssText =
@@ -166,6 +167,27 @@
       <div data-testid="cellInnerDiv"
         style="display:block;width:200px;height:40px">
         <h2 role="heading">Who to follow</h2>
+      </div>
+    `;
+    feed.append(feedFixture);
+    await wait();
+
+    feedFixture.insertAdjacentHTML("beforeend", `
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <div data-testid="UserCell">Suggested account</div>
+      </div>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <div data-testid="UserCell">Another suggested account</div>
+      </div>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <a href="/i/connect_people">Show more</a>
+      </div>
+      <div data-testid="cellInnerDiv"
+        style="display:block;width:200px;height:40px">
+        <article data-testid="tweet">Following post</article>
       </div>
       <div data-xes-test="new-posts-overlay"
         style="position:absolute;display:block;width:200px;height:40px">
@@ -183,15 +205,46 @@
         role="button"
         style="display:block;width:160px;height:30px"
       >Alice posted</button>
-    `;
-    feed.append(feedFixture);
+      <article data-testid="tweet"
+        style="display:block;width:200px;height:100px">
+        <div data-xes-test="analytics-post-body"
+          style="display:block;width:200px;height:30px">Post body</div>
+        <div data-xes-test="analytics-promotion-wrapper"
+          style="display:block;width:200px;height:60px;margin-bottom:16px">
+          <div>
+            <button role="button">Close</button>
+            <img
+              alt=""
+              src="https://ton.twimg.com/onboarding/premium_nux/analytics_v1.png"
+            >
+            <div>
+              <span>Access your post analytics</span>
+              <a href="/i/account_analytics">Learn more</a>
+            </div>
+          </div>
+        </div>
+      </article>
+    `);
     await wait();
 
     const adPost = feedFixture.children[0];
     const boostedPost = feedFixture.children[1];
-    const feedWhoToFollow = feedFixture.children[2];
-    const newPostsOverlay = feedFixture.children[3];
-    const ordinaryFeedControl = feedFixture.children[4];
+    const feedWhoToFollowCells = [
+      feedFixture.children[2],
+      feedFixture.children[3],
+      feedFixture.children[4],
+      feedFixture.children[5]
+    ];
+    const followingPost = feedFixture.children[6];
+    const newPostsOverlay = feedFixture.children[7];
+    const ordinaryFeedControl = feedFixture.children[8];
+    const analyticsPost = feedFixture.children[9];
+    const analyticsPostBody = analyticsPost.querySelector(
+      '[data-xes-test="analytics-post-body"]'
+    );
+    const analyticsPromotion = analyticsPost.querySelector(
+      '[data-xes-test="analytics-promotion-wrapper"]'
+    );
     assert(
       adPost.getAttribute("data-xes-promotion") === "ad",
       "MutationObserver did not classify the feed ad"
@@ -201,8 +254,14 @@
       "MutationObserver did not classify the Boosted post"
     );
     assert(
-      feedWhoToFollow.getAttribute("data-xes-feed-module") === "who",
-      "MutationObserver did not classify the inline Who to follow module"
+      feedWhoToFollowCells.every(
+        (cell) => cell.getAttribute("data-xes-feed-module") === "who"
+      ),
+      "MutationObserver did not classify every inline Who to follow cell"
+    );
+    assert(
+      !followingPost.hasAttribute("data-xes-feed-module"),
+      "Inline Who to follow classification leaked into the next post"
     );
     assert(
       newPostsOverlay.getAttribute("data-xes-feed-overlay") === "new-posts",
@@ -211,6 +270,11 @@
     assert(
       !ordinaryFeedControl.hasAttribute("data-xes-feed-overlay"),
       "An ordinary feed control was misclassified as the new-posts overlay"
+    );
+    assert(
+      analyticsPromotion.getAttribute("data-xes-promotion-card") ===
+        "post-analytics",
+      "MutationObserver did not classify the post-analytics promotion"
     );
     assert(isVisible(adPost), "Feed ad should start visible");
     assert(isVisible(boostedPost), "Boosted post should start visible");
@@ -231,8 +295,8 @@
     await setAttribute("data-xes-hide-boosted-posts", false);
 
     assert(
-      isVisible(feedWhoToFollow),
-      "Inline Who to follow should start visible"
+      feedWhoToFollowCells.every(isVisible),
+      "Every inline Who to follow cell should start visible"
     );
     assert(
       isVisible(slots.get("who")),
@@ -240,8 +304,12 @@
     );
     await setAttribute("data-xes-hide-feed-who-to-follow", true);
     assert(
-      !isVisible(feedWhoToFollow),
-      "Inline Who to follow module did not hide"
+      feedWhoToFollowCells.every((cell) => !isVisible(cell)),
+      "Inline Who to follow module left visible cells"
+    );
+    assert(
+      isVisible(followingPost),
+      "Feed Who to follow toggle hid the following post"
     );
     assert(
       isVisible(slots.get("who")),
@@ -249,8 +317,9 @@
     );
     results.push({
       feature: "feed Who to follow",
-      hidden: true,
-      sidebarPreserved: true
+      hiddenCells: feedWhoToFollowCells.length,
+      sidebarPreserved: true,
+      followingPostPreserved: true
     });
     await setAttribute("data-xes-hide-feed-who-to-follow", false);
 
@@ -277,6 +346,30 @@
       ordinaryFeedControlPreserved: true
     });
     await setAttribute("data-xes-hide-new-posts-popup", false);
+
+    assert(
+      isVisible(analyticsPromotion),
+      "Post-analytics promotion should start visible"
+    );
+    assert(isVisible(analyticsPostBody), "Synthetic post body should be visible");
+    await setAttribute("data-xes-hide-post-analytics-promotions", true);
+    const hiddenPromotionRect = analyticsPromotion.getBoundingClientRect();
+    assert(
+      getComputedStyle(analyticsPromotion).display === "none" &&
+        hiddenPromotionRect.width === 0 &&
+        hiddenPromotionRect.height === 0,
+      "Post-analytics promotion left a visible wrapper"
+    );
+    assert(
+      isVisible(analyticsPostBody) && isVisible(analyticsPost),
+      "Analytics promotion toggle hid the surrounding post"
+    );
+    results.push({
+      feature: "post-analytics promotion",
+      hiddenRect: [hiddenPromotionRect.width, hiddenPromotionRect.height],
+      surroundingPostPreserved: true
+    });
+    await setAttribute("data-xes-hide-post-analytics-promotions", false);
 
     assert(
       !root.hasAttribute("data-xes-compact-timeline"),

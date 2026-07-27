@@ -23,7 +23,8 @@ const {
   promotionTypeForLabel,
   sidebarModuleForHeading,
   feedModuleForHeading,
-  isNewPostsControlLabel
+  isNewPostsControlLabel,
+  isPostAnalyticsPromotionLabel
 } = context.XEnhancementRules;
 
 test("classifies feed ads separately from boosted posts", () => {
@@ -63,18 +64,31 @@ test("recognizes X's dedicated new-posts control labels", () => {
   assert.equal(isNewPostsControlLabel(undefined), false);
 });
 
+test("recognizes only the post-analytics promotion heading", () => {
+  assert.equal(
+    isPostAnalyticsPromotionLabel("Access your post analytics"),
+    true
+  );
+  assert.equal(isPostAnalyticsPromotionLabel("Post analytics"), false);
+  assert.equal(isPostAnalyticsPromotionLabel("View post analytics"), false);
+  assert.equal(isPostAnalyticsPromotionLabel(undefined), false);
+});
+
 test("uses independent feed ad and boosted selectors", () => {
   assert.match(contentCss, /data-xes-promotion="ad"/);
   assert.match(contentCss, /data-xes-promotion="boosted"/);
 });
 
-test("targets the complete inline Who to follow timeline cell", () => {
+test("targets every bounded inline Who to follow timeline cell", () => {
   assert.match(contentCss, /data-xes-hide-feed-who-to-follow/);
   assert.match(contentCss, /data-xes-feed-module="who"/);
   assert.match(
     contentScript,
     /primaryColumn"\] \[data-testid="cellInnerDiv"/
   );
+  assert.match(contentScript, /data-testid="UserCell"/);
+  assert.match(contentScript, /link\.textContent\.trim\(\) === "Show more"/);
+  assert.match(contentScript, /previousCell\?\.getAttribute/);
 });
 
 test("targets the complete marked new-posts overlay", () => {
@@ -82,6 +96,15 @@ test("targets the complete marked new-posts overlay", () => {
   assert.match(contentCss, /data-xes-feed-overlay="new-posts"/);
   assert.match(contentScript, /position === "absolute"/);
   assert.match(contentScript, /closest\('\[role="status"\]'\)/);
+});
+
+test("targets the complete post-analytics promotion wrapper", () => {
+  assert.match(contentCss, /data-xes-hide-post-analytics-promotions/);
+  assert.match(contentCss, /data-xes-promotion-card="post-analytics"/);
+  assert.match(contentScript, /a\[href="\/i\/account_analytics"\]/);
+  assert.match(contentScript, /element\.matches\('button\[role="button"\]'\)/);
+  assert.match(contentScript, /containingArticle\?\.querySelector/);
+  assert.match(contentScript, /wrapper\.children\.length === 1/);
 });
 
 test("targets complete marked sidebar slots without the broad Trending wrapper", () => {

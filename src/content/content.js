@@ -10,7 +10,8 @@
     promotionTypeForLabel,
     sidebarModuleForHeading,
     feedModuleForHeading,
-    isNewPostsControlLabel
+    isNewPostsControlLabel,
+    isPostAnalyticsPromotionLabel
   } = globalThis.XEnhancementRules;
 
   const ROOT_ATTRIBUTE_BY_SETTING = Object.freeze({
@@ -19,6 +20,8 @@
     hideBoostedPosts: "data-xes-hide-boosted-posts",
     hideFeedWhoToFollow: "data-xes-hide-feed-who-to-follow",
     hideNewPostsPopup: "data-xes-hide-new-posts-popup",
+    hidePostAnalyticsPromotions:
+      "data-xes-hide-post-analytics-promotions",
     hideSidebar: "data-xes-hide-sidebar",
     hideSidebarSearch: "data-xes-hide-sidebar-search",
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
@@ -36,6 +39,7 @@
   const PROMOTION_ATTRIBUTE = "data-xes-promotion";
   const FEED_MODULE_ATTRIBUTE = "data-xes-feed-module";
   const FEED_OVERLAY_ATTRIBUTE = "data-xes-feed-overlay";
+  const PROMOTION_CARD_ATTRIBUTE = "data-xes-promotion-card";
   const SIDEBAR_ITEM_ATTRIBUTE = "data-xes-sidebar-item";
   const SIDEBAR_ITEM_SELECTORS = Object.freeze({
     search: 'form[role="search"][aria-label="Search"]',
@@ -124,13 +128,70 @@
   function markFeedModules(root) {
     for (const heading of matchingElements(root, 'h2[role="heading"]')) {
       const moduleName = feedModuleForHeading(heading.textContent);
-      const module = heading.closest(
+      const headingCell = heading.closest(
         '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
       );
 
-      if (moduleName && module) {
-        module.setAttribute(FEED_MODULE_ATTRIBUTE, moduleName);
+      if (moduleName && headingCell) {
+        headingCell.setAttribute(FEED_MODULE_ATTRIBUTE, moduleName);
+        markFollowingFeedModuleCells(headingCell, moduleName);
       }
+    }
+
+    const cells = new Set();
+
+    if (root instanceof Element) {
+      const containingCell = root.closest(
+        '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
+      );
+      if (containingCell) {
+        cells.add(containingCell);
+      }
+    }
+
+    if (typeof root.querySelectorAll === "function") {
+      for (const cell of root.querySelectorAll(
+        '[data-testid="primaryColumn"] [data-testid="cellInnerDiv"]'
+      )) {
+        cells.add(cell);
+      }
+    }
+
+    for (const cell of cells) {
+      const previousCell = cell.previousElementSibling;
+
+      if (
+        previousCell?.getAttribute(FEED_MODULE_ATTRIBUTE) === "who" &&
+        isWhoToFollowContinuationCell(cell)
+      ) {
+        cell.setAttribute(FEED_MODULE_ATTRIBUTE, "who");
+      }
+    }
+  }
+
+  function isWhoToFollowContinuationCell(cell) {
+    if (cell.querySelector('[data-testid="UserCell"]')) {
+      return true;
+    }
+
+    return [...cell.querySelectorAll('a, [role="link"]')].some(
+      (link) => link.textContent.trim() === "Show more"
+    );
+  }
+
+  function markFollowingFeedModuleCells(headingCell, moduleName) {
+    if (moduleName !== "who") {
+      return;
+    }
+
+    let cell = headingCell.nextElementSibling;
+
+    while (
+      cell?.matches('[data-testid="cellInnerDiv"]') &&
+      isWhoToFollowContinuationCell(cell)
+    ) {
+      cell.setAttribute(FEED_MODULE_ATTRIBUTE, moduleName);
+      cell = cell.nextElementSibling;
     }
   }
 
@@ -168,6 +229,59 @@
       newPostsOverlayFor(control)?.setAttribute(
         FEED_OVERLAY_ATTRIBUTE,
         "new-posts"
+      );
+    }
+  }
+
+  function postAnalyticsPromotionFor(link) {
+    const article = link.closest('article[data-testid="tweet"]');
+
+    if (!article) {
+      return null;
+    }
+
+    let card = link;
+
+    while (card.parentElement && card.parentElement !== article) {
+      card = card.parentElement;
+      const hasHeading = [...card.querySelectorAll("span")].some((element) =>
+        isPostAnalyticsPromotionLabel(element.textContent)
+      );
+
+      const hasDirectCloseButton = [...card.children].some((element) =>
+        element.matches('button[role="button"]')
+      );
+
+      if (hasHeading && hasDirectCloseButton) {
+        const wrapper = card.parentElement;
+
+        return wrapper !== article && wrapper.children.length === 1
+          ? wrapper
+          : card;
+      }
+    }
+
+    return null;
+  }
+
+  function markPromotionCards(root) {
+    const links = matchingElements(root, 'a[href="/i/account_analytics"]');
+
+    if (root instanceof Element) {
+      const containingArticle = root.closest('article[data-testid="tweet"]');
+      const existingLink = containingArticle?.querySelector(
+        'a[href="/i/account_analytics"]'
+      );
+
+      if (existingLink) {
+        links.add(existingLink);
+      }
+    }
+
+    for (const link of links) {
+      postAnalyticsPromotionFor(link)?.setAttribute(
+        PROMOTION_CARD_ATTRIBUTE,
+        "post-analytics"
       );
     }
   }
@@ -250,6 +364,7 @@
     markPaidPosts(root);
     markFeedModules(root);
     markFeedOverlays(root);
+    markPromotionCards(root);
     markSidebarItems(root);
 
     // Add future DOM transformations here. Keep each transformation idempotent:

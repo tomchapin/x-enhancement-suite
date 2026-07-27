@@ -9,6 +9,7 @@
     hideBoostedPosts: true,
     hideFeedWhoToFollow: false,
     hideNewPostsPopup: false,
+    hidePostAnalyticsPromotions: false,
     hideSidebar: false,
     hideSidebarSearch: false,
     hideSidebarPremium: true,
@@ -52,6 +53,13 @@
       key: "hideNewPostsPopup",
       label: "Hide new-posts popup",
       description: "Removes the blue scroll-to-top notice for new posts.",
+      group: "Feed"
+    },
+    {
+      key: "hidePostAnalyticsPromotions",
+      label: "Hide analytics promotions",
+      description:
+        "Removes post-analytics Premium upsells from feeds and posts.",
       group: "Feed"
     },
     {

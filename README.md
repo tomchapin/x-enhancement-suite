@@ -17,6 +17,8 @@ The extension currently provides:
 - Independent filtering for feed ads and Boosted posts
 - A separate filter for inline “Who to follow” recommendations in the feed
 - A separate filter for the blue new-posts scroll-to-top popup
+- A separate filter for post-analytics Premium promotions in feeds and post
+  detail views
 - Granular controls for search, Premium, Live on X, news, trends, Who to
   follow, sidebar ads, and footer links
 - Independent controls for Premium and Grok navigation links
@@ -108,6 +110,12 @@ same area repeatedly.
 - Identify the new-posts popup by its dedicated accessibility label, then mark
   and hide its complete positioned overlay wrapper. Do not match generic
   visible text such as `posted`.
+- X renders inline “Who to follow” as consecutive timeline cells: a heading,
+  one or more `UserCell` rows, and a final “Show more” link. Mark every bounded
+  cell in that sequence and stop before the following post.
+- Identify the post-analytics promotion by both its exact heading and its
+  `/i/account_analytics` action. Hide the complete card margin wrapper, not the
+  surrounding post.
 - Scope sidebar rules to `[data-testid="sidebarColumn"]`.
 - Hide the complete sidebar slot, not merely its inner `<aside>`, `<section>`,
   or heading. Hiding only the semantic child leaves X's rounded border or a
@@ -282,11 +290,12 @@ npm run live-test
 
 The matrix currently checks all built-in controls: eight granular sidebar
 slots, whole-sidebar behavior, the master switch, Premium and Grok navigation,
-independent Ad/Boosted classification and filtering, inline “Who to follow”
-filtering without affecting the sidebar module, the new-posts popup without
-affecting ordinary feed controls, and continued absence of Compact timeline.
-It restores the page's original extension attributes and removes its synthetic
-feed fixtures in a `finally` block.
+independent Ad/Boosted classification and filtering, every cell in an inline
+“Who to follow” module without affecting the sidebar or following post, the
+new-posts popup without affecting ordinary feed controls, the post-analytics
+promotion without affecting its surrounding post, and continued absence of
+Compact timeline. It restores the page's original extension attributes and
+removes its synthetic feed fixtures in a `finally` block.
 
 Feed tests use temporary synthetic Ad and Boosted posts so the result does not
 depend on what X happens to serve during a particular session. Sidebar tests
