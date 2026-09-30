@@ -65,6 +65,7 @@ interface labels. Filtering is limited to feeds; opening an individual
 | **Hide Premium card** | Off | Removes the “Subscribe to Premium” sidebar card. |
 | **Hide Live on X** | Off | Removes the live-broadcasts module. |
 | **Hide Today’s News** | Off | Removes the news module. |
+| **Hide sports** | Off | Removes the complete NFL sidebar scores and fixtures panel, including its border and “Show more” row. |
 | **Hide trending topics** | Off | Removes only the “Trending now” module rather than the entire sidebar. |
 | **Hide Who to follow** | Off | Removes the complete sidebar account-recommendation panel. |
 | **Hide sidebar ads** | Off | Removes display-ad placements from the sidebar. |
@@ -360,7 +361,7 @@ With an authenticated X tab open in the isolated browser:
 npm run live-test
 ```
 
-The matrix currently checks all built-in controls: eight granular sidebar
+The matrix currently checks all built-in controls: nine granular sidebar
 slots, whole-sidebar behavior, the master switch, Premium and Grok navigation,
 independent Ad/Boosted classification and filtering, every cell in an inline
 “Who to follow” module without affecting the sidebar or following post, the
@@ -369,6 +370,23 @@ promotion without affecting its surrounding post, complete-cell keyword
 filtering without affecting an unmarked post, and continued absence of Compact
 timeline. It restores the page's original extension attributes and removes its
 synthetic feed fixtures in a `finally` block.
+
+The sports panel also has a deterministic browser regression check that does
+not need an authenticated X session:
+
+```sh
+npm run sports-browser-test
+```
+
+It uses the same isolated Chrome for Testing on port `9229`, creates a temporary
+local fixture tab, and closes it afterward. It runs the actual settings, popup,
+content script, and CSS with a mocked storage API. The fixture preserves the
+reported NFL panel structure: `nfl_scores_sidebar` is a tracking child beside
+the visible scores, not the card itself. Checks cover the complete bordered
+slot, panels outside the Trending stack, neighboring modules, feed width,
+asynchronous insertion, and restoration through both switches. Set
+`SPORTS_PANEL_HTML` to a captured panel HTML file to run against its full markup.
+This fixture check supplements the authenticated live matrix.
 
 Feed tests use temporary synthetic Ad and Boosted posts so the result does not
 depend on what X happens to serve during a particular session. Sidebar tests

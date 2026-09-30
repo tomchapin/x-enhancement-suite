@@ -32,6 +32,7 @@
     hideSidebarPremium: "data-xes-hide-sidebar-premium",
     hideSidebarLive: "data-xes-hide-sidebar-live",
     hideSidebarNews: "data-xes-hide-sidebar-news",
+    hideSidebarSports: "data-xes-hide-sidebar-sports",
     hideTrends: "data-xes-hide-trends",
     hideWhoToFollow: "data-xes-hide-who-to-follow",
     hideSidebarAds: "data-xes-hide-sidebar-ads",
@@ -50,6 +51,7 @@
   const SIDEBAR_ITEM_SELECTORS = Object.freeze({
     search: 'form[role="search"][aria-label="Search"]',
     premium: 'aside[aria-label="Subscribe to Premium"]',
+    sports: '[data-testid="nfl_scores_sidebar"]',
     trends: 'section:has([aria-label="Timeline: Trending now"])',
     who: 'aside[aria-label="Who to follow"]',
     ads: '[data-testid$="SspAd"]',
@@ -363,7 +365,14 @@
     );
 
     if (!region) {
-      return null;
+      // The NFL test ID is on a tracking child, beside the visible scores.
+      // Use the supplied card wrapper if there is no shared Trending stack.
+      const sidebar = element.closest('[data-testid="sidebarColumn"]');
+      const panel = element.parentElement;
+      return element.matches(SIDEBAR_ITEM_SELECTORS.sports) &&
+        sidebar && panel && panel !== sidebar
+        ? panel
+        : null;
     }
 
     let slot = element;

@@ -20,6 +20,7 @@
     hideSidebarPremium: false,
     hideSidebarLive: false,
     hideSidebarNews: false,
+    hideSidebarSports: false,
     hideTrends: false,
     hideWhoToFollow: false,
     hideSidebarAds: false,
@@ -106,6 +107,13 @@
       key: "hideSidebarNews",
       label: "Hide Today’s News",
       description: "Removes the news module.",
+      group: "Right sidebar",
+      nested: true
+    },
+    {
+      key: "hideSidebarSports",
+      label: "Hide sports",
+      description: "Removes the sidebar sports scores and fixtures panel.",
       group: "Right sidebar",
       nested: true
     },

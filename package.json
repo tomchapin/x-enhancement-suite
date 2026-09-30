@@ -1,6 +1,6 @@
 {
   "name": "x-enhancement-suite",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "description": "Experimental (dev mode only) Chrome extension for personal X DOM enhancements.",
   "type": "module",
@@ -10,6 +10,7 @@
     "package": "node scripts/package.mjs",
     "cdp": "node scripts/cdp.mjs",
     "live-test": "node scripts/cdp.mjs --file scripts/live-matrix.js",
+    "sports-browser-test": "node scripts/sports-browser-check.mjs",
     "check": "npm run test && npm run validate"
   },
   "engines": {

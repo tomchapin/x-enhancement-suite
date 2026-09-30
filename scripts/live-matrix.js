@@ -40,6 +40,7 @@
       ["data-xes-hide-sidebar-premium", "premium"],
       ["data-xes-hide-sidebar-live", "live"],
       ["data-xes-hide-sidebar-news", "news"],
+      ["data-xes-hide-sidebar-sports", "sports"],
       ["data-xes-hide-trends", "trends"],
       ["data-xes-hide-who-to-follow", "who"],
       ["data-xes-hide-sidebar-ads", "ads"],

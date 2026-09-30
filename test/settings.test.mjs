@@ -149,12 +149,25 @@ test("groups granular sidebar toggles", () => {
       "hideSidebarPremium",
       "hideSidebarLive",
       "hideSidebarNews",
+      "hideSidebarSports",
       "hideTrends",
       "hideWhoToFollow",
       "hideSidebarAds",
       "hideSidebarFooter"
     ]
   );
+});
+
+test("existing settings gain an independent sports toggle without changing saved filters", () => {
+  const existing = normalizeSettings({ enabled: true, hideTrends: true });
+  assert.equal(existing.hideSidebarSports, false);
+  assert.equal(existing.hideTrends, true);
+
+  const updated = normalizeSettings({ ...existing, hideSidebarSports: true });
+  assert.equal(updated.hideSidebarSports, true);
+  assert.equal(updated.hideTrends, true);
+  assert.equal(updated.enabled, true);
+  assert.equal(normalizeSettings({ hideSidebarSports: "true" }).hideSidebarSports, false);
 });
 
 test("groups independent feed controls", () => {

@@ -52,6 +52,9 @@
 :root[data-xes-enabled="true"][data-xes-hide-sidebar-news="true"]
   [data-testid="sidebarColumn"]
   [data-xes-sidebar-item="news"],
+:root[data-xes-enabled="true"][data-xes-hide-sidebar-sports="true"]
+  [data-testid="sidebarColumn"]
+  [data-xes-sidebar-item="sports"],
 :root[data-xes-enabled="true"][data-xes-hide-trends="true"]
   [data-testid="sidebarColumn"]
   [data-xes-sidebar-item="trends"],

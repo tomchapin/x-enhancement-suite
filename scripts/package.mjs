@@ -36,7 +36,11 @@ try {
 
   await mkdir(outputDirectory, { recursive: true });
   await rm(output, { force: true });
-  await execFileAsync("zip", ["-qr", output, basename(stagingDirectory)], {
+  const archiveCommand = process.platform === "win32" ? "tar.exe" : "zip";
+  const archiveArguments = process.platform === "win32"
+    ? ["-a", "-cf", output, basename(stagingDirectory)]
+    : ["-qr", output, basename(stagingDirectory)];
+  await execFileAsync(archiveCommand, archiveArguments, {
     cwd: stagingRoot
   });
 
