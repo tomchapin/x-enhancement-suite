@@ -360,22 +360,33 @@
   }
 
   function sidebarSlotFor(element) {
+    const sidebar = element.closest('[data-testid="sidebarColumn"]');
+    if (!sidebar) {
+      return null;
+    }
+
+    // The scores test ID belongs to an empty tracking child, not the card.
+    // Start at the complete card so a shallow stack cannot hide just that child.
+    const sportsPanel = element.matches(SIDEBAR_ITEM_SELECTORS.sports)
+      ? element.parentElement
+      : null;
+    if (sportsPanel === sidebar) {
+      return null;
+    }
+
     const region = element.closest(
       '[data-testid="sidebarColumn"] [aria-label="Trending"]'
     );
 
     if (!region) {
-      // The NFL test ID is on a tracking child, beside the visible scores.
-      // Use the supplied card wrapper if there is no shared Trending stack.
-      const sidebar = element.closest('[data-testid="sidebarColumn"]');
-      const panel = element.parentElement;
-      return element.matches(SIDEBAR_ITEM_SELECTORS.sports) &&
-        sidebar && panel && panel !== sidebar
-        ? panel
-        : null;
+      return sportsPanel;
     }
 
-    let slot = element;
+    let slot = sportsPanel ?? element;
+
+    if (slot.parentElement === region) {
+      return slot;
+    }
 
     while (
       slot.parentElement &&

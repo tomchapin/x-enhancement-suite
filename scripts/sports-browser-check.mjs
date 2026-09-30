@@ -51,14 +51,17 @@ try {
       <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
       <style>
         #primary { width: 600px; }
-        #sports, #outside > div { border: 1px solid gray; margin: 12px; padding: 8px; width: 350px; }
+        #sports, #outside > div, #direct > div, #direct-parent > div { border: 1px solid gray; margin: 12px; padding: 8px; width: 350px; }
         #sibling { border: 1px solid gray; padding: 8px; width: 350px; }
       </style></head><body>
       <main id="primary" data-testid="primaryColumn">Feed ${panel}</main>
       <div data-testid="sidebarColumn"><section aria-label="Trending"><div>
         <div id="sports">${panel}</div>
         <div id="sibling"><aside aria-label="Who to follow"><h2 role="heading">Who to follow</h2></aside></div>
-      </div></section><div id="outside">${panel}</div></div>
+      </div></section><div id="outside">${panel}</div>
+      <section id="direct" aria-label="Trending">${panel}<div id="direct-sibling">Direct-region sibling</div></section>
+      <section aria-label="Trending"><div id="direct-parent">${panel}<div id="direct-parent-sibling">Sibling inside stack</div></div></section>
+      </div>
       <div id="settings"></div><div id="message"></div><button id="open-options"></button>
       </body></html>`
   });
@@ -90,6 +93,8 @@ try {
     const sports = document.getElementById("sports");
     const sibling = document.getElementById("sibling");
     const outside = document.querySelector("#outside > div");
+    const direct = document.querySelector("#direct > div");
+    const directParent = document.querySelector("#direct-parent > div");
     const feed = document.getElementById("primary");
     const width = feed.getBoundingClientRect().width;
     await settle();
@@ -99,17 +104,20 @@ try {
     await settle();
     assert(sports.dataset.xesSidebarItem==="sports","Complete Trending slot was not marked");
     assert(outside.dataset.xesSidebarItem==="sports","Standalone panel wrapper was not marked");
+    assert(direct.dataset.xesSidebarItem==="sports","Direct-region card was not marked; the empty tracker must not be the hidden target");
+    assert(directParent.dataset.xesSidebarItem==="sports","Card without an extra slot wrapper was not marked");
     assert(visible(sports) && visible(outside),"Off state should preserve both sports panels");
     assert(!feed.querySelector('[data-xes-sidebar-item="sports"]'),"A feed post was mistaken for a sidebar panel");
     const before = sports.getBoundingClientRect();
     toggle.click();
     await settle();
     assert(testStored.settings.hideSidebarSports===true,"Popup did not save the sports toggle");
-    assert(hidden(sports) && hidden(outside),"Sports toggle left a visible card or layout slot");
+    assert(hidden(sports) && hidden(outside) && hidden(direct) && hidden(directParent),"Sports toggle left a visible card or layout slot");
+    assert(visible(document.getElementById("direct-sibling")) && visible(document.getElementById("direct-parent-sibling")),"Sports toggle hid a neighboring module in a shallow stack");
     assert(visible(sibling),"Sports toggle hid an unrelated module");
     assert(visible(feed) && feed.getBoundingClientRect().width===width,"Sports toggle changed the feed");
     await XEnhancementSettings.setSettings({enabled:false});
-    assert(visible(sports) && visible(outside),"Master switch did not restore sports");
+    assert(visible(sports) && visible(outside) && visible(direct) && visible(directParent),"Master switch did not restore sports");
     await XEnhancementSettings.setSettings({enabled:true});
     const added = sports.cloneNode(true);
     added.id="added-sports";
@@ -126,6 +134,7 @@ try {
     await XEnhancementSettings.setSettings({hideSidebarSports:true});
     assert(hidden(sibling) && hidden(sports),"Sports and existing sidebar filters are not independent");
     return { popupSave:true, completeSlotHidden:[0,0], standalonePanelHidden:[0,0],
+      directRegionCardHidden:[0,0], unwrappedStackCardHidden:[0,0],
       siblingsPreserved:true, masterRestores:true, toggleRestores:true,
       asynchronousInsertion:true, feedWidth:width, independentFilters:true,
       visibleSlotBefore:[before.width,before.height] };

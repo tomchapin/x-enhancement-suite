@@ -233,6 +233,35 @@ All automated or agent-driven X inspection must use a separate Chrome for
 Testing process. Do not attach DevTools automation to the user's everyday
 Chrome, activate that browser, switch its tabs, or launch URLs into it.
 
+The user can explicitly authorize scoped inspection through the installed
+browser connection in their existing authenticated Chrome session. Such an
+authorization overrides the isolation guideline and persists within the task;
+do not repeatedly request it. Limit those checks to the target sidebar DOM,
+extension reloads, and settings propagation. Restore temporary settings after
+testing. Do not run the broad fixture-inserting live matrix in that session.
+
+The installed browser connection may prohibit `chrome://extensions` and
+extension popup URLs. Respect that restriction; do not use another browser
+surface or raw CDP to bypass it. In that case, ask the user to reload the
+extension and operate its toggle, then inspect the resulting X DOM through
+the permitted connection. Confirm that the complete sports card measures
+`0 × 0`, the feed width stays unchanged, and hiding persists after refreshing X.
+
+On Windows, copying a logged-in Chrome profile does **not** guarantee an
+authenticated debug session. Chromium's app-bound encryption provider
+[refuses to decrypt cookies in a non-default user-data directory](https://raw.githubusercontent.com/chromium/chromium/main/chrome/browser/os_crypt/app_bound_encryption_provider_win.cc).
+This also applies when the clone is opened with the same installed Chrome
+executable. An exact encrypted-cookie file copy is insufficient. Verify the
+actual feed and sidebar in the test browser before treating cloning as
+successful. Use an explicitly authorized existing browser connection, or a
+dedicated profile with its own one-time sign-in if the user prefers isolation.
+
+X can return HTTP 403 for the headless user agent. In an isolated test browser,
+use a normal Chrome user agent and matching client hints; apply the user agent
+to worker requests as well as the page. A copied X service-worker cache can
+otherwise turn that 403 into `ERR_INVALID_RESPONSE`; bypass the worker for
+diagnosis. Neither adjustment recreates authentication.
+
 The established setup uses:
 
 - Chrome for Testing rather than the normal Google Chrome application
@@ -383,7 +412,8 @@ local fixture tab, and closes it afterward. It runs the actual settings, popup,
 content script, and CSS with a mocked storage API. The fixture preserves the
 reported NFL panel structure: `nfl_scores_sidebar` is a tracking child beside
 the visible scores, not the card itself. Checks cover the complete bordered
-slot, panels outside the Trending stack, neighboring modules, feed width,
+slot, cards directly inside the Trending region, cards without an extra slot
+wrapper, panels outside the Trending stack, neighboring modules, feed width,
 asynchronous insertion, and restoration through both switches. Set
 `SPORTS_PANEL_HTML` to a captured panel HTML file to run against its full markup.
 This fixture check supplements the authenticated live matrix.
